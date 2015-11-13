@@ -24,7 +24,7 @@ int random_emission_distribution() {
    float radius = 10.0;
 
    Emissions all_emissions;
-   Image outimage;
+  // Image outimage;
    
    for (int i=0; i<N; i++) {
       x = 10 * radius * (  (float)rand() / RAND_MAX -0.5) ;
@@ -49,7 +49,7 @@ int random_emission_distribution() {
       em.altitude = 100.0;
       all_emissions.add_emission(em);
 
-      outimage.bin_emission(em, 100,100,100);
+//      outimage.bin_emission(em, 100,100,100);
 
       
 

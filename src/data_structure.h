@@ -2,9 +2,20 @@
 #define DATASTRUCTURE
 
 #include <vector> 
+#include <math.h>
+
+
 using namespace std;
 
 typedef vector<float> threevector;
+
+
+
+
+struct GlobalInfo {
+
+
+};
 
 
 struct Emission {
@@ -24,14 +35,16 @@ struct Emissions {
    }
 };
 
+/*
+int tt[60][60];
 
 struct Image {
 
    const int dim = 500;
 
-   float R[500][500] = {{0}};
-   float G[500][500] = {{0}};
-   float B[500][500] = {{0}};
+   float R = new float[100][100][100];
+   float G = new float[100][100][100];
+   float B = new float[100][100][100];
 
 
    int bin_emission(Emission e, int boxx, int boxy, int boxz) {
@@ -40,11 +53,11 @@ struct Image {
       float z = e.position[2];
 
       if ( e.energy==1 ) {
-         G[ int(x/boxx * dim) ][ int(y/boxy*dim) ]++;
+         G[ int(x/boxx * dim) ][ int(y/boxy*dim) ][int(z/boxx * dim)] +=e.intensity ;
       } else if (e.energy == 2) {
-         R[ int(x/boxx*dim) ][ int(y/boxy*dim) ]++;
+         R[ int(x/boxx*dim) ][ int(y/boxy*dim) ][int(z/boxx * dim)]+= e.intensity ;
       } else if (e.energy == 3) {
-         B[ int(x/boxx*dim) ][ int(y/boxy*dim) ]++;
+         B[ int(x/boxx*dim) ][ int(y/boxy*dim) ][int(z/boxx * dim)]+=e.intensity ;
       }
 
    }
@@ -53,8 +66,8 @@ struct Image {
 
 
 
-
 };
+*/
 
 
 
