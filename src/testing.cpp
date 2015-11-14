@@ -7,7 +7,7 @@ using namespace std;
 
 
 
-int random_emission_distribution() {
+/*int random_emission_distribution() {
    ofstream ff;
    srand (time(NULL));
    ff.open("out.xyz");
@@ -63,7 +63,7 @@ ff.close();
 
 }
 
-
+*/
 
 #endif
 
