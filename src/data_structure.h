@@ -20,7 +20,7 @@ class Simulation {
       float box_sizey = 100.0; //.push_back(100.00);
       float box_sizez = 200.0; //push_back(200.00);
       int N = 100;
-      int tmax = 1000;
+      int tmax = 10000;
       float E_low_threshold = 10; 
       float dt = 0.001;
       float velocity_scale = 10.0;
@@ -28,9 +28,12 @@ class Simulation {
       int timescale_red_emission = 3000;
       int timescale_green_emission = 200;
       int timescale_blue_emission = 2;
-      int wavelength_red = 500.0;
-      int wavelength_green = 600.0;
-      int wavelength_blue = 800.0;
+      const int wavelength_red = 500.0;
+      const int wavelength_green = 600.0;
+      const int wavelength_blue = 800.0;
+      
+      const float hplanck=1.0;
+      const float clight=1.0;
       vector<Electron> electrons;
 
 
@@ -74,15 +77,15 @@ public:
 
    //times that each emission should be active for  
    float get_t_emit_red() {
-      vector<float> rnd = gen_random(1);
+      vector<float> rnd = gen_random(2);
       return rnd[0] * sim->timescale_red_emission;
    }
    float get_t_emit_green() {
-      vector<float> rnd = gen_random(1);
+      vector<float> rnd = gen_random(2);
       return rnd[0] * sim->timescale_green_emission;
    }
    float get_t_emit_blue() {
-      vector<float> rnd = gen_random(1);
+      vector<float> rnd = gen_random(2);
       return rnd[0] * sim->timescale_blue_emission;
    }
 
