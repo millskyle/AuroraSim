@@ -27,7 +27,6 @@ int main() {
       ee.reset(&sim);
       ee.sim = &sim;
       sim.electrons.push_back(ee);
-      cout << i <<endl;
 
    }
 
@@ -39,11 +38,9 @@ int main() {
    for (int t=0; t< sim.tmax; t++ ) {
 
       for (int i=0; i<sim.N ; i++) {
-   cout << "here " << t<< ":"<<i<<"  " << endl;
          Electron* e = &sim.electrons[i]; //make a pointer to the electron we're dealing with
          rnd = (float)rand()/RAND_MAX;
          if (rnd < e->get_p_interaction() ) {
-            cout << "emitting:";
             rnd = (float)rand()/RAND_MAX;
             if (rnd < e->get_p_emit_red()) {
                //emit red
@@ -60,8 +57,21 @@ int main() {
                e->emitting = 1;
                e->emitting_time_left = e->get_t_emit_blue();
                e->emitting_wavelength = sim.wavelength_blue;
-               cout << "blue emission, ";
             }
+
+         }
+
+         //Check to see if electrom will emit energy this timestep:
+         if (e->emitting==1) {
+            e->E -= sim.hplanck * sim.clight / e->emitting_wavelength;
+            e->emitting_time_left -= 1;
+            if (e->emitting_time_left < 1) {
+               e->emitting = 0;
+               cout << e->emitting_wavelength << "nm  no longer emitting" << endl;
+               e->emitting_wavelength = 0;
+            }
+         
+
 
          }
 
