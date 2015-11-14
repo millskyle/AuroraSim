@@ -13,7 +13,7 @@ vector<float> gen_random(int N) {
     vector<float> ret;
     float rnd1;
     float rnd2;
-    for (int i=0; i<(N/2); i++ ) {
+    for (int i=0; i<int(((float)N/2.0) +1); i++ ) {
        rnd1 = (float)rand() / RAND_MAX;
        rnd2 = (float)rand() / RAND_MAX;
        ret.push_back( sqrt( -2.0 * log(rnd1)) * cos( 2 * M_PI * rnd2)   );
