@@ -36,15 +36,39 @@ class Simulation {
       const float hplanck=1.0;
       const float clight=1.0;
       vector<Electron> electrons;
+ };
+
+class OutputReport {
+  public:
+    vector<float> EvsT;
+    int interactions;
+    int respawns;
 
 
+    int write(string filename) {
+        ofstream report;
+        report.open(filename);
+
+       
+       report << "Particle 3:\nTime-dependent energy" << endl;
+       for (int t=0; t < EvsT.size()-1; t++ ) {
+          report << t << "\t" << EvsT[t] << endl;
+       }
+
+       report << "\n" ;
+       report << "Interactions per life:" << (float)interactions/(float)respawns << endl;
+
+       report.close();     
+       return 0;
+
+    }
 
 };
 
 class Electron {
 public:
-   int interaction_count;
-   int iteration_count;
+   int interaction_count=0;
+   int respawn_count=0;
    float x;
    Simulation* sim;
    float y;
@@ -111,6 +135,7 @@ public:
       Fx = 0; 
       Fy = 0; 
       Fz = 0;
+      respawn_count +=1;
    }
 
 
@@ -252,15 +277,10 @@ class PhotonDensity {
 
      }
      
-        
-
-
-     
-
-
-
 
 };
+
+
 
 
 

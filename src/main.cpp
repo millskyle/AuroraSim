@@ -21,6 +21,7 @@ int main() {
    vector<float> randoms;
    Simulation sim;
    PhotonDensity photon_density;
+   OutputReport report;
    
    unsigned int voxelx,voxely,voxelz;
 
@@ -43,10 +44,13 @@ int main() {
    float p_interaction = 0.1;
 
    cout << endl;
+   cout << "Beginning to integrate: " << endl;
    for (int t=0; t< sim.tmax; t++ ) {
-      cout << "\r  t = " << t << "            ";
-      
-
+      if (t%500==0) { 
+         cout << "\r   t = " << t << "          ";
+         cout.flush(); 
+      }
+ 
       for (int i=0; i<sim.N ; i++) {
          Electron* e = &sim.electrons[i]; //make a pointer to the electron we're dealing with
            //if electron has left the cell, or has not enough energy remaining, we're done tracking it.
@@ -62,6 +66,7 @@ int main() {
 
          rnd = (float)rand()/RAND_MAX;
          if (rnd < e->get_p_interaction() ) {
+            e->interaction_count++;
             rnd = (float)rand()/RAND_MAX;
             if (rnd < e->get_p_emit_red()) {
                //emit red
@@ -86,7 +91,7 @@ int main() {
          if (e->emitting==1) {
             e->E -= sim.hplanck * sim.clight / e->emitting_wavelength;
             if(e->ID==3) {
-               cout << e->E << endl;
+               report.EvsT.push_back(e->E);
             }
             e->emitting_time_left -= 1;
             
@@ -142,7 +147,9 @@ photon_density.write_image(40);
 debug_xyz.close();
 
 
-
+report.interactions = sim.electrons[2].interaction_count;
+report.respawns = sim.electrons[2].respawn_count;
+report.write("output/report.log");
 
 
 
