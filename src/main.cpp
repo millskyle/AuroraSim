@@ -20,7 +20,6 @@ int main() {
    //srand ( time(NULL));
    vector<float> randoms;
    Simulation sim;
-   sim.rescale();
    PhotonDensity photon_density;
    OutputReport report;
    
@@ -43,11 +42,11 @@ int main() {
 
    float rnd;
    float p_interaction = 0.1;
-
+   int t=0;
    cout << endl;
    cout << "Beginning to integrate: " << endl;
-   for (int t=0; t< sim.tmax; t++ ) {
-      if (t%500==0) {
+   for (t=0; t< sim.tmax; t++ ) {
+      if (t%10==0) {
          photon_density.write_image(t);
          photon_density.reset();
 
@@ -66,7 +65,7 @@ int main() {
          while (  e->x <= 0 || e->x >= sim.box_sizex
             || e->y <= 0 || e->y >= sim.box_sizey
             || e->z <= 0 || e->z >= sim.box_sizez
-            || e->E <= (sim.hplanck * sim.clight / e->sim->wavelength_red ) ) {
+            || e->E <= (sim.hc / e->sim->wavelength_red ) ) {
             e->reset();
             e->t = t;
          }
@@ -97,7 +96,7 @@ int main() {
 
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
-            e->E -= sim.hplanck * sim.clight / e->emitting_wavelength;
+            e->E -= sim.hc / e->emitting_wavelength;
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==3) {
                report.EvsT.push_back(e->E);
@@ -128,21 +127,29 @@ int main() {
 
          //add any applicable forces to e->Fx, e->Fy, e->Fz :
 
+         randoms = gen_random(3);
+         e->Fx =100.*( (randoms[1] ))/sim.dt;
+         e->Fy =100*( (randoms[0] ))/sim.dt;
+         e->Fz =100*( (randoms[2]))/sim.dt;
+        
          
          
          //Perform equation of motion integration:
 
-         e->vx += 0.5 * (e->Fx / sim.m_e) * sim.dt*sim.dt ;
-         e->vy += 0.5 * (e->Fy / sim.m_e) * sim.dt*sim.dt ;
-         e->vz += 0.5 * (e->Fz / sim.m_e) * sim.dt*sim.dt ;
+         e->vx += 0.5 * (e->Fx / sim.m_e) * sim.dt ;
+         e->vy += 0.5 * (e->Fy / sim.m_e) * sim.dt ;
+         e->vz += 0.5 * (e->Fz / sim.m_e) * sim.dt ;
 
          e->x += e->vx * sim.dt;
          e->y += e->vy * sim.dt;
          e->z += e->vz * sim.dt;
 
         
-         //cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ; 
-         cout << e->vx << "\t" << e->vy << "\t" << e->vz << "\n" ; 
+//         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ;
+         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
+
+//         cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ; 
+//         cout << e->vx << "\t" << e->vy << "\t" << e->vz << "\n" ; 
          
          
       }
@@ -151,7 +158,7 @@ int main() {
 
    cout << endl;
 
-photon_density.write_image(40);
+photon_density.write_image(t);
 
 
 debug_xyz.close();

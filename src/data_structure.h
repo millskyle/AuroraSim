@@ -18,65 +18,33 @@ class Electron ;
 class Simulation {
    public: 
       int N = 10000;
-      int tmax = 10000;
+      int tmax = 50;
 
       /* box size, in km */
       float box_sizex = 100.0; //.push_back(100.00);
       float box_sizey = 100.0; //.push_back(100.00);
       float box_sizez = 200.0; //push_back(200.00);
+      
+      float dt=0.001;
    
       /* Mean energy of electrons when they begin, in keV */
       float E_mean = 10.0;
       
       float E_low_threshold = 10; 
       
-      float velocity_scale = 100.0;
-      int timescale_red_emission = 3000;
-      int timescale_green_emission = 200;
-      int timescale_blue_emission = 2;
-      float wavelength_red = 500.0e-9;
-      float wavelength_green = 600.0e-9;
-      float wavelength_blue = 800.0e-9;
+      int timescale_red_emission = 30/dt;
+      int timescale_green_emission = 2/dt;
+      int timescale_blue_emission = 0.002/dt;
+      float wavelength_red = 500.0;
+      float wavelength_green = 600.0;
+      float wavelength_blue = 800.0;
       
-      const float unscaled_hplanck=4.13566766e-15;
-      const float unscaled_clight=299792458;
-      const float m_e = 9.10938356e-31;
       vector<Electron> electrons;
 
-      float v_mean;
-      float E_c ;
-      float v_c ;
-      float t_c ;
+      const float m_e = 1.0;
+      float hc = 1.23984197 ; //*plank's constant in keV*nm 
 
-      float clight ;
-      float hplanck ;
 
-      const float eVJ = 1.60218e-19;
-
-     float dt;
-
-      int rescale() {
-         E_c = 1.0/(E_mean*1000.0*eVJ);
-         v_c = sqrt(m_e / (2 * E_mean*eVJ*1000.0) );
-         t_c = (1.0/(box_sizez*1000)) / v_c;
-
-         clight = v_c*unscaled_clight;
-         hplanck = E_c * t_c * unscaled_hplanck;
-         wavelength_red = wavelength_red*(v_c*t_c);
-         wavelength_blue = wavelength_blue*(v_c*t_c);
-         wavelength_green = wavelength_green*(v_c*t_c);
-
-         cout << "E_c="<<E_c<<endl;
-         cout << "v_c="<<v_c<<endl;
-         cout << "t_c="<<t_c<<endl;
-
-         cout << "clight="<<clight<<endl;
-         cout << "hplanck="<<hplanck<<endl;
-         cout << "wavelength_red="<<wavelength_red<<endl;
-         cout << "wavelength_green="<<wavelength_green<<endl;
-         cout << "wavelength_blue="<<wavelength_blue<<endl;
-         
-      }
 
 
  };
@@ -120,7 +88,7 @@ public:
    float vx;
    float vy;
    float vz;
-   float E;
+   float E=0;
    bool emitting;
    float emitting_time_left;
    float emitting_wavelength;
@@ -129,6 +97,7 @@ public:
    float Fz;
    float t;
    float ID;
+   float tmp;
    
    
    float get_p_interaction() {
@@ -169,11 +138,14 @@ public:
       y = sim->box_sizey * (float)rand() / RAND_MAX;
       z = sim->box_sizez -0.0001;
       randoms = gen_random(3);
-      E = sim->E_c * (randoms[0]+1.0);
-      vx = 0; //0.00001 * sim->v_c * randoms[0];
-      vy = 0;//0.00001 * sim->v_c * randoms[1];
-      vz = sqrt(2*E / sim->m_e);
-      E = 0.5 * sim->m_e * (pow(vx,2) + pow(vy,2) + pow(vz, 2));
+      E = sim->E_mean * (abs(randoms[0])+1.0);
+//      cout << sim->E_mean << "*" << "(" << randoms[0]<<"+1.0) = " << E << endl; 
+      vx = (0.1 * sqrt(2*E/sim->m_e) * randoms[1]);
+      vy = (0.1 * sqrt(2*E/sim->m_e) * randoms[2]);
+      tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
+      vz = -sqrt( 2*E / sim->m_e - tmp   ) / sim->dt;
+//      cout << "!  " <<  vx << "\t" << vy << "\t" << vz << "\t" << tmp << endl;
+//      E = 0.5 * sim->m_e * (pow(vx,2) + pow(vy,2) + pow(vz, 2));
       emitting = 0;
       emitting_time_left = 0;
       emitting_wavelength = 0;
