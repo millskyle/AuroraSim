@@ -150,6 +150,8 @@ class PhotonDensity {
       unsigned int resolution_y = 250;
       unsigned int resolution_z = 500;
 
+      float optical_decay_power = 2.0; //light intensity drops off as distance to this power (vacuum would be 2.0) 
+
       float *R  = new float[resolution_x*resolution_y*resolution_z];
       float *G  = new float[resolution_x*resolution_y*resolution_z];
       float *B  = new float[resolution_x*resolution_y*resolution_z];
@@ -219,7 +221,8 @@ class PhotonDensity {
         float *Rflat  = new float[resolution_y*resolution_z];
         float *Gflat  = new float[resolution_y*resolution_z];
         float *Bflat  = new float[resolution_y*resolution_z];
-
+        
+        float opt_decay = 0;
 
         float pixelsumR =0;
         float pixelsumG =0;
@@ -235,9 +238,10 @@ class PhotonDensity {
               pixelsumG=0;
               pixelsumB=0;
               for (int i=0; i<resolution_x; i++)  {
-                 pixelsumR += get_element(R, i, j, k);
-                 pixelsumG += get_element(G, i, j, k);
-                 pixelsumB += get_element(B, i, j, k);
+                 opt_decay =  pow( (  1.0 - float(i)/float(resolution_x) ), optical_decay_power);
+                 pixelsumR += get_element(R, i, j, k) / (0.8*opt_decay);
+                 pixelsumG += get_element(G, i, j, k) / (0.9*opt_decay);
+                 pixelsumB += get_element(B, i, j, k) / (opt_decay);
               }
               Rflat[k*resolution_y + j ] = pixelsumR;
               Gflat[k*resolution_y + j ] = pixelsumG;
