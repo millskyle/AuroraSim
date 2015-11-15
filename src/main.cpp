@@ -17,7 +17,7 @@ using namespace std;
 
 
 int main() {
-   srand ( time(NULL));
+   //srand ( time(NULL));
    vector<float> randoms;
    Simulation sim;
    PhotonDensity photon_density;
@@ -44,7 +44,6 @@ int main() {
 
    cout << endl;
    for (int t=0; t< sim.tmax; t++ ) {
-//      debug_xyz << sim.N << "\n t=" << t << endl;
       cout << "\r  t = " << t << "            ";
       
 
@@ -52,16 +51,15 @@ int main() {
          Electron* e = &sim.electrons[i]; //make a pointer to the electron we're dealing with
            //if electron has left the cell, or has not enough energy remaining, we're done tracking it.
          //Reset it.
-         while (  e->x < 0 || e->x > sim.box_sizex
-            || e->y < 0 || e->y > sim.box_sizey
-            || e->z < 0 || e->z > sim.box_sizez
-            || e->E < (sim.hplanck * sim.clight / e->sim->wavelength_red ) ) {
+         while (  e->x <= 0 || e->x >= sim.box_sizex
+            || e->y <= 0 || e->y >= sim.box_sizey
+            || e->z <= 0 || e->z >= sim.box_sizez
+            || e->E <= (sim.hplanck * sim.clight / e->sim->wavelength_red ) ) {
             e->reset();
             e->t = t;
-            cout << "resetting electron " <<e->ID <<  endl;
          }
+         
 
- //       debug_xyz << " A " << e->x << " " << e->y << " " << e->z << "\n" ;
          rnd = (float)rand()/RAND_MAX;
          if (rnd < e->get_p_interaction() ) {
             rnd = (float)rand()/RAND_MAX;
@@ -96,7 +94,7 @@ int main() {
             voxelx = int((float)photon_density.resolution_x / (float)sim.box_sizex * e->x);
             voxely = int((float)photon_density.resolution_y / (float)sim.box_sizey * e->y);
             voxelz = int((float)photon_density.resolution_z / (float)sim.box_sizez * e->z);
-
+            
 
 
             if (e->emitting_wavelength == sim.wavelength_red ) {

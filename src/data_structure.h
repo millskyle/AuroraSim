@@ -20,10 +20,10 @@ class Simulation {
       float box_sizex = 100.0; //.push_back(100.00);
       float box_sizey = 100.0; //.push_back(100.00);
       float box_sizez = 200.0; //push_back(200.00);
-      int N = 100;
-      int tmax = 600;
+      int N = 10000;
+      int tmax = 10000;
       float E_low_threshold = 10; 
-      const float dt = 0.1;
+      const float dt = 0.001;
       float velocity_scale = 100.0;
       float m_e = 1.0 ;
       int timescale_red_emission = 3000;
@@ -43,6 +43,8 @@ class Simulation {
 
 class Electron {
 public:
+   int interaction_count;
+   int iteration_count;
    float x;
    Simulation* sim;
    float y;
@@ -97,10 +99,10 @@ public:
       t = 0;
       x = sim->box_sizex * (float)rand() / RAND_MAX;
       y = sim->box_sizey * (float)rand() / RAND_MAX;
-      z = sim->box_sizez ;
+      z = sim->box_sizez -0.0001;
       randoms = gen_random(3);
-      vx = 0.001 * sim->velocity_scale * randoms[0];
-      vy = 0.001 * sim->velocity_scale * randoms[1];
+      vx = 0.1 * sim->velocity_scale * randoms[0];
+      vy = 0.1 * sim->velocity_scale * randoms[1];
       vz = - (sim->velocity_scale + ( sim->velocity_scale * 0.1 * randoms[2]) );
       E = 0.5 * sim->m_e * (pow(vx,2) + pow(vy,2) + pow(vz, 2));
       emitting = 0;
@@ -129,13 +131,11 @@ class PhotonDensity {
 
    
       int incr_element(float *A ,int i, int j, int k) {
-         //A[i*i*resolution_x + j*resolution_y + k]++;
          A[i + resolution_x *( j + resolution_y * k) ]++;
-//         cout << A[i*resolution_x + j*resolution_y + k*resolution_x] << endl;
+         return 0;
       }
 
       float get_element(float *A, int i, int j, int k) {
-//         return A[i*i*resolution_x + j*resolution_y + k];
          return A[i + resolution_x *( j + resolution_y * k) ];
       }
        
