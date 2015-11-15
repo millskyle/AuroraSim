@@ -20,6 +20,7 @@ int main() {
    //srand ( time(NULL));
    vector<float> randoms;
    Simulation sim;
+   sim.rescale();
    PhotonDensity photon_density;
    OutputReport report;
    
@@ -97,6 +98,7 @@ int main() {
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
             e->E -= sim.hplanck * sim.clight / e->emitting_wavelength;
+//            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==3) {
                report.EvsT.push_back(e->E);
             }
@@ -139,7 +141,8 @@ int main() {
          e->z += e->vz * sim.dt;
 
         
-          
+         //cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ; 
+         cout << e->vx << "\t" << e->vy << "\t" << e->vz << "\n" ; 
          
          
       }
