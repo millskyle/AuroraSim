@@ -20,7 +20,7 @@ class Simulation {
       float box_sizex = 100.0; //.push_back(100.00);
       float box_sizey = 100.0; //.push_back(100.00);
       float box_sizez = 200.0; //push_back(200.00);
-      int N = 10000;
+      int N = 1000000;
       int tmax = 10000;
       float E_low_threshold = 10; 
       const float dt = 0.001;
@@ -156,6 +156,17 @@ class PhotonDensity {
       float *G  = new float[resolution_x*resolution_y*resolution_z];
       float *B  = new float[resolution_x*resolution_y*resolution_z];
 
+      int reset() {
+         cout << "\r Zeroing out photon density                                     " ;
+         cout.flush();
+         for (int i=0; i<(resolution_x*resolution_y*resolution_z); i++ ) {                 
+                 R[i] = 0;
+                 G[i] = 0;
+                 B[i] = 0;
+         }
+
+      }
+
    
       int incr_element(float *A ,int i, int j, int k) {
          A[i + resolution_x *( j + resolution_y * k) ]++;
@@ -198,7 +209,8 @@ class PhotonDensity {
         gmax = max(maxR,maxG);
         gmax = max(gmax,maxB);
 
-        cout << "\"Brightest\" voxel had un-normed brightness of " << gmax << endl;
+        cout << "\rBrightest voxel had un-normed brightness of " << gmax << "                             ";
+        cout.flush();
 
         *R = scalar_divide(R,gmax); 
         *G = scalar_divide(G,gmax); 
@@ -210,7 +222,8 @@ class PhotonDensity {
      
      
      int write_image(int t) {
-        cout << "Normalizing for max brightness" << endl;
+        cout << "\rNormalizing for max brightness                                 " ;
+        cout.flush();
         normalize();
 
         ofstream img;
@@ -238,7 +251,8 @@ class PhotonDensity {
               pixelsumG=0;
               pixelsumB=0;
               for (int i=0; i<resolution_x; i++)  {
-                 opt_decay =  pow( (  1.0 - float(i)/float(resolution_x) ), optical_decay_power);
+                 opt_decay =  pow( 
+                     (  1 - float(i)/float(resolution_x)  ) , optical_decay_power);
                  pixelsumR += get_element(R, i, j, k) / (0.8*opt_decay);
                  pixelsumG += get_element(G, i, j, k) / (0.9*opt_decay);
                  pixelsumB += get_element(B, i, j, k) / (opt_decay);

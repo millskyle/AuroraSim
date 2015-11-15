@@ -46,8 +46,15 @@ int main() {
    cout << endl;
    cout << "Beginning to integrate: " << endl;
    for (int t=0; t< sim.tmax; t++ ) {
-      if (t%500==0) { 
-         cout << "\r   t = " << t << "          ";
+      if (t%500==0) {
+         photon_density.write_image(t);
+         photon_density.reset();
+
+      }
+
+
+      if (t%50==0) { 
+         cout << "\r   t = " << t << "                                                    ";
          cout.flush(); 
       }
  
