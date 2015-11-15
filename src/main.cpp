@@ -36,20 +36,32 @@ int main() {
    cout << "Electron objects created" << endl;
  
    ofstream debug_xyz;
-   debug_xyz.open("out.xyz");
+  // debug_xyz.open("out.xyz");
 
 
    float rnd;
    float p_interaction = 0.1;
 
-
+   cout << endl;
    for (int t=0; t< sim.tmax; t++ ) {
-      debug_xyz << sim.N << "\n t=" << t << endl;
+//      debug_xyz << sim.N << "\n t=" << t << endl;
+      cout << "\r  t = " << t << "            ";
       
 
       for (int i=0; i<sim.N ; i++) {
          Electron* e = &sim.electrons[i]; //make a pointer to the electron we're dealing with
-         debug_xyz << " A " << e->x << " " << e->y << " " << e->z << "\n" ;
+           //if electron has left the cell, or has not enough energy remaining, we're done tracking it.
+         //Reset it.
+         while (  e->x < 0 || e->x > sim.box_sizex
+            || e->y < 0 || e->y > sim.box_sizey
+            || e->z < 0 || e->z > sim.box_sizez
+            || e->E < (sim.hplanck * sim.clight / e->sim->wavelength_red ) ) {
+            e->reset();
+            e->t = t;
+            cout << "resetting electron " <<e->ID <<  endl;
+         }
+
+ //       debug_xyz << " A " << e->x << " " << e->y << " " << e->z << "\n" ;
          rnd = (float)rand()/RAND_MAX;
          if (rnd < e->get_p_interaction() ) {
             rnd = (float)rand()/RAND_MAX;
@@ -75,11 +87,15 @@ int main() {
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
             e->E -= sim.hplanck * sim.clight / e->emitting_wavelength;
+            if(e->ID==3) {
+               cout << e->E << endl;
+            }
             e->emitting_time_left -= 1;
+            
 
-            voxelx = floor((float)photon_density.resolution_x / (float)sim.box_sizex * e->x);
-            voxely = floor((float)photon_density.resolution_y / (float)sim.box_sizey * e->y);
-            voxelz = floor((float)photon_density.resolution_z / (float)sim.box_sizez * e->z);
+            voxelx = int((float)photon_density.resolution_x / (float)sim.box_sizex * e->x);
+            voxely = int((float)photon_density.resolution_y / (float)sim.box_sizey * e->y);
+            voxelz = int((float)photon_density.resolution_z / (float)sim.box_sizez * e->z);
 
 
 
@@ -97,13 +113,6 @@ int main() {
                e->emitting_wavelength = 0;
             }
          }
-         //if electron has exited the bottom of the cell, or has not enough energy remaining.
-         if (e->z < 0 || e->E < (sim.hplanck * sim.clight / e->sim->wavelength_red ) ) {
-            e->reset();
-            e->t = t;
-//            cout << "resetting electron" << endl;
-         }
-
 
          //add any applicable forces to e->Fx, e->Fy, e->Fz :
 
@@ -119,15 +128,17 @@ int main() {
          e->y += e->vy * sim.dt;
          e->z += e->vz * sim.dt;
 
-         
-         
+        
+          
          
          
       }
 
    }
 
+   cout << endl;
 
+photon_density.write_image(40);
 
 
 debug_xyz.close();
