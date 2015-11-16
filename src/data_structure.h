@@ -18,7 +18,7 @@ class Electron ;
 class Simulation {
    public: 
       int N = 10000;
-      int tmax = 50;
+      int tmax = 40000;
 
       /* box size, in km */
       float box_sizex = 100.0; //.push_back(100.00);
@@ -316,8 +316,31 @@ class PhotonDensity {
 };
 
 
+class MagneticField {
+   public:
+      float strength = 1000.0;
 
+      vector<float> evaluate(float t,float x,float y,float z){
+         vector<float> r;
+         r.push_back(strength*sin(x-50)/(x-50));
+         r.push_back(strength*sin(x-50)/(x-50));
+         r.push_back(0);
+         return r;
+      }
+
+      
+
+      
+
+
+
+
+};
 
 
 
 #endif
+
+
+
+
