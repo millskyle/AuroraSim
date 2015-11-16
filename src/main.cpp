@@ -46,7 +46,7 @@ int main() {
    cout << endl;
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
-      if (t%10==0) {
+      if (t%500==0) {
          photon_density.write_image(t);
          photon_density.reset();
 
@@ -128,9 +128,9 @@ int main() {
          //add any applicable forces to e->Fx, e->Fy, e->Fz :
 
          randoms = gen_random(3);
-         e->Fx =100.*( (randoms[1] ))/sim.dt;
-         e->Fy =100*( (randoms[0] ))/sim.dt;
-         e->Fz =100*( (randoms[2]))/sim.dt;
+         e->Fx =100.*cos(2*M_PI*t/100.)   /sim.dt;
+         e->Fy =100*sin(2*M_PI*t/100.)    /sim.dt;
+         e->Fz =100*sin(2*M_PI*t/100.)     /sim.dt;
         
          
          
@@ -146,7 +146,7 @@ int main() {
 
         
 //         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ;
-         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
+//         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
 
 //         cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ; 
 //         cout << e->vx << "\t" << e->vy << "\t" << e->vz << "\n" ; 
