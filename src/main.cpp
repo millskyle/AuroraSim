@@ -22,8 +22,11 @@ int main() {
    Simulation sim;
    PhotonDensity photon_density;
    OutputReport report;
+   MagneticField mag_field;
    
    unsigned int voxelx,voxely,voxelz;
+
+   vector<float> B;
 
 
    for (int i=0; i<sim.N; i++) {
@@ -64,12 +67,14 @@ int main() {
          //Reset it.
          while (  e->x <= 0 || e->x >= sim.box_sizex
             || e->y <= 0 || e->y >= sim.box_sizey
-            || e->z <= 0 || e->z >= sim.box_sizez
+            || e->z <= 0 //|| e->z >= sim.box_sizez
             || e->E <= (sim.hc / e->sim->wavelength_red ) ) {
             e->reset();
             e->t = t;
          }
-         
+        
+
+        if (e->z < sim.box_sizez) {
 
          rnd = (float)rand()/RAND_MAX;
          if (rnd < e->get_p_interaction() ) {
@@ -125,14 +130,20 @@ int main() {
             }
          }
 
+        }
+
          //add any applicable forces to e->Fx, e->Fy, e->Fz :
 
          randoms = gen_random(3);
-         e->Fx =100.*cos(2*M_PI*t/100.)   /sim.dt;
-         e->Fy =100*sin(2*M_PI*t/100.)    /sim.dt;
-         e->Fz =100*sin(2*M_PI*t/100.)     /sim.dt;
-        
-         
+
+         B = mag_field.at(e->x,e->y,e->z,t);
+
+//         cout << B[0] << " " << B[1] << "  " << B[2]  << endl;
+
+         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 100. ;
+         e->Fy += (e->vz * B[0] - e->vx * B[2]) /100. ;
+         e->Fz += (e->vx * B[1] - e->vy * B[0]) /100.;
+
          
          //Perform equation of motion integration:
 

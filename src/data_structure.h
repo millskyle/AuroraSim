@@ -131,17 +131,25 @@ public:
       return (rnd[0]) * sim->timescale_blue_emission;
    }
 
+
+   int rescale_velocities() {
+      //rescales the velocities to be consistent with the current kinetic energy
+      float R = E / 0.5*m_e*(vx*vx + vy*vy + vz*vz);
+
+
+   }
+
    
    int reset() {
       t = 0;
       x = sim->box_sizex * (float)rand() / RAND_MAX;
       y = sim->box_sizey * (float)rand() / RAND_MAX;
-      z = sim->box_sizez -0.0001;
+      z = 2*sim->box_sizez -0.0001;
       randoms = gen_random(3);
       E = sim->E_mean * (abs(randoms[0])+1.0);
 //      cout << sim->E_mean << "*" << "(" << randoms[0]<<"+1.0) = " << E << endl; 
-      vx = (0.1 * sqrt(2*E/sim->m_e) * randoms[1]);
-      vy = (0.1 * sqrt(2*E/sim->m_e) * randoms[2]);
+      vx = (0.01 * sqrt(2*E/sim->m_e) * randoms[1]);
+      vy = (0.01 * sqrt(2*E/sim->m_e) * randoms[2]);
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
       vz = -sqrt( 2*E / sim->m_e - tmp   ) / sim->dt;
 //      cout << "!  " <<  vx << "\t" << vy << "\t" << vz << "\t" << tmp << endl;
@@ -292,6 +300,7 @@ class PhotonDensity {
                 }
 */
 
+
            }
         }
         
@@ -320,27 +329,16 @@ class MagneticField {
    public:
       float strength = 1000.0;
 
-      vector<float> evaluate(float t,float x,float y,float z){
+      vector<float> at(float t,float x,float y,float z){
          vector<float> r;
          r.push_back(strength*sin(x-50)/(x-50));
          r.push_back(strength*sin(x-50)/(x-50));
          r.push_back(0);
          return r;
       }
-
-      
-
-      
-
-
-
-
 };
 
 
 
 #endif
-
-
-
 
