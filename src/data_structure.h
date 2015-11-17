@@ -17,7 +17,7 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 100000;
+      int N = 10000;
       int tmax = 1510;
 
       /* box size, in km */
@@ -110,6 +110,22 @@ public:
    float ID;
    float tmp;
    
+
+   float p_emit;
+   float p_emit_r;
+   float p_emit_g;
+   float p_emit_b;
+
+   float calculate_probabilities(float h) {
+        float p_emit_r = get_p_emit_red(h);
+        float p_emit_g = get_p_emit_green(h);
+        float p_emit_b = get_p_emit_blue(h);
+        float p_emit = p_emit_r + p_emit_g + p_emit_b ;
+        p_emit_r /= p_emit;
+        p_emit_g /= p_emit;
+        p_emit_b /= p_emit;
+
+   }
    
 
    float get_p_emit_red(float x) {

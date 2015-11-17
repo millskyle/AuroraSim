@@ -56,7 +56,7 @@ int main() {
       }
 
 
-      if (t%50==0) { 
+      if (t%5==0) { 
          cout << "\r   t = " << t << "                                                    ";
          cout.flush(); 
       }
@@ -82,20 +82,21 @@ int main() {
           && e->y <= sim.box_sizey    ) {
 
          rnd = (float)rand()/RAND_MAX;
-         if (rnd < e->get_p_interaction( e->z ) ) {
+         e->calculate_probabilities(e->z);
+         if (rnd < e->p_emit) {
             e->interaction_count++;
             rnd = (float)rand()/RAND_MAX;
-            if (rnd < e->get_p_emit_red(e->z)) {
+            if (rnd < e->p_emit_r) {
                //emit red
                e->emitting = 1;
                e->emitting_time_left = e->get_t_emit_red();
                e->emitting_wavelength = sim.wavelength_red;
-            } else if (rnd < (e->get_p_emit_red(e->z) + e->get_p_emit_green(e->z)) ) {
+            } else if (rnd < (e->p_emit_r + e->p_emit_g)) {
                //emit green
                e->emitting = 1;
                e->emitting_time_left = e->get_t_emit_green();
                e->emitting_wavelength = sim.wavelength_green;
-            } else {
+            } else { 
                //emit blue
                e->emitting = 1;
                e->emitting_time_left = e->get_t_emit_blue();
@@ -169,7 +170,7 @@ int main() {
          e->y += e->vy * sim.dt;
          e->z += e->vz * sim.dt;
          
-
+if (e->ID==3) cout << p_emit_r << "  " << p_emit_g << "  " << p_emit_b << "  "<< p_emit << endl;
         
 //         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\tE: " << e->E << "\n" ;
 //         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
