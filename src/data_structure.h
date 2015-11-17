@@ -6,6 +6,7 @@
 #include "utility_functions.h" 
 #include <fstream>
 #include <string.h>
+#include <fftw3.h>
 
 using namespace std;
 
@@ -17,8 +18,8 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 10000;
-      int tmax = 1510;
+      int N = 100000;
+      int tmax = 1000;
 
       /* box size, in km */
       float box_sizex = 100.0; //.push_back(100.00);
@@ -32,9 +33,9 @@ class Simulation {
       
       float E_low_threshold = 10; 
       
-      int timescale_red_emission = 30/dt;
-      int timescale_green_emission = 2/dt;
-      int timescale_blue_emission = 0.002/dt;
+      int timescale_red_emission = 110/dt;
+      int timescale_green_emission = 0.7/dt;
+      int timescale_blue_emission = 0.001/dt;
       float wavelength_red = 500.0;
       float wavelength_green = 600.0;
       float wavelength_blue = 800.0;
@@ -111,23 +112,12 @@ public:
    float tmp;
    
 
-   float p_emit;
-   float p_emit_r;
-   float p_emit_g;
-   float p_emit_b;
+   float p_emit=0;
+   float p_emit_r=0;
+   float p_emit_g=0;
+   float p_emit_b=0;
 
-   float calculate_probabilities(float h) {
-        float p_emit_r = get_p_emit_red(h);
-        float p_emit_g = get_p_emit_green(h);
-        float p_emit_b = get_p_emit_blue(h);
-        float p_emit = p_emit_r + p_emit_g + p_emit_b ;
-        p_emit_r /= p_emit;
-        p_emit_g /= p_emit;
-        p_emit_b /= p_emit;
-
-   }
-   
-
+    
    float get_p_emit_red(float x) {
       return 
       1.97692801419e-17 * pow(x, 8 ) + 
@@ -141,6 +131,7 @@ public:
      -0.00815824073091 * pow(x, 0 ) ;
    }
 
+   
    float get_p_emit_green(float x) {
      return 1.22309846233e-16 * pow(x, 8 ) + 
      -1.04247753054e-13 * pow(x, 7 ) + 
@@ -153,6 +144,7 @@ public:
      0.0028840983908 * pow(x, 0 ) ;
    }
 
+   
    float get_p_emit_blue(float x) {
       return 
          7.71746456929e-17 * pow(x, 8 ) + 
@@ -166,7 +158,19 @@ public:
         0.00402470459253 * pow(x, 0 );
   
    }
-   
+
+
+   float calculate_probabilities(float h) {
+        p_emit_r = get_p_emit_red(h);
+        p_emit_g = get_p_emit_green(h);
+        p_emit_b = get_p_emit_blue(h);
+        p_emit = p_emit_r + p_emit_g + p_emit_b ;
+        p_emit_r = p_emit_r / p_emit;
+        p_emit_g = p_emit_g / p_emit;
+        p_emit_b = p_emit_b / p_emit;
+        //cout << h<<"   "   << p_emit_r << "  " << p_emit_g << "  " << p_emit_b << "  "    << p_emit << endl;
+
+   }
    float get_p_interaction(float h) {
       return 0.4*(get_p_emit_red(h) + get_p_emit_green(h) +  get_p_emit_blue(h)) ;
    }
@@ -174,17 +178,24 @@ public:
    //times that each emission should be active for  
    float get_t_emit_red() {
       vector<float> rnd = gen_random(2);
-      return (rnd[0]) * sim->timescale_red_emission;
+      return (rnd[0]+1) * sim->timescale_red_emission;
    }
    float get_t_emit_green() {
       vector<float> rnd = gen_random(2);
-      return (rnd[0]) * sim->timescale_green_emission;
+      return (rnd[0]+1) * sim->timescale_green_emission;
    }
    float get_t_emit_blue() {
       vector<float> rnd = gen_random(2);
-      return (rnd[0]) * sim->timescale_blue_emission;
+      return (rnd[0]+1) * sim->timescale_blue_emission;
    }
 
+   int random_collision() {
+      vector<float> rands = gen_random(4);
+      float theta = 2*M_PI*abs(rands[0]);
+      vx = vx * cos(theta);
+      vy = vy * sin(theta);
+      vz = -sqrt( 2*E / sim->m_e - (vx*vx + vy*vy) );
+    }
 
    int rescale_velocities() {
       //rescales the velocities to be consistent with the current kinetic energy
@@ -251,7 +262,7 @@ class PhotonDensity {
 
    
       int incr_element(float *A ,int i, int j, int k,float n) {
-         A[i + resolution_x *( j + resolution_y * k) ]+=n;
+         A[i + resolution_x *( j + resolution_y * k) ] += n;
          return 0;
       }
 
@@ -298,6 +309,7 @@ class PhotonDensity {
         *G = scalar_divide(G,gmax); 
         *B = scalar_divide(B,gmax); 
 
+            
 
      }
 
@@ -384,7 +396,7 @@ class PhotonDensity {
 
 class MagneticField {
    public:
-      float strength = 10.0;
+      float strength = 1.0;
 
       vector<float> at(float t,float x,float y,float z){
          vector<float> r;
@@ -394,6 +406,115 @@ class MagneticField {
          return r;
       }
 };
+
+
+class ChargeDensity {
+   public:
+      int resolution_x = 250;
+      int resolution_y = 250;
+      int resolution_z = 500;
+
+      float *p = new float[resolution_x*resolution_y*resolution_z];
+ 
+};
+
+
+class ElectricField {
+   public:
+   
+      int compute(Simulation *sim, ChargeDensity *rho) {
+
+         int Nx = rho->resolution_x ;
+         int Ny = rho->resolution_y ;
+         int Nz = rho->resolution_z ;
+         
+         float Lx = sim->box_sizex ; 
+         float Ly = sim->box_sizey ;
+         float Lz = sim->box_sizez ;
+         
+         float dx = Lx/float(Nx-1) ;
+         float dy = Ly/float(Ny-1) ;
+         float dz = Lz/float(Nz-1) ;
+   
+         vector<double> in(Nx*Ny*Nz, 0);
+         vector<double> out(Nx*Ny*Nz, 0);
+
+         fftw_plan q;
+
+         q = fftw_plan_r2r_3d(Nx,Ny,Nz,in.data(), out.data(), FFTW_REDFT00, FFTW_REDFT00, FFTW_REDFT00, 0 );
+         
+         for (int i=0; i<Nx; i++) {
+            for (int j=0; j<Ny; j++) {
+               for (int k=0; k< Nz; k++) {
+                  in[i + Nx *( j + Ny * k) ] = (double)(rho->p[i + int(Nx) *( j + int(Ny) * k) ]);
+               }
+            }
+         }
+
+         fftw_execute(q);
+
+
+
+}
+
+         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+};
+
 
 
 
