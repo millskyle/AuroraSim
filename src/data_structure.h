@@ -215,7 +215,7 @@ public:
       t = 0;
       x = sim->box_sizex * (float)rand() / RAND_MAX;
       y = sim->box_sizey * (float)rand() / RAND_MAX;
-      z = 1.2*sim->box_sizez -0.0001;
+      z = 0.9*sim->box_sizez -0.0001;
       randoms = gen_random(3);
       E = 1000*sim->E_mean * (abs(randoms[0])+1.0);
       vx = (0.0001 * sqrt(2*E/sim->m_e) * randoms[1]);
@@ -410,12 +410,29 @@ class MagneticField {
 
 class ChargeDensity {
    public:
-      int resolution_x = 250;
-      int resolution_y = 250;
-      int resolution_z = 500;
+      int resolution_x = 100;
+      int resolution_y = 100;
+      int resolution_z = 200;
 
       float *p = new float[resolution_x*resolution_y*resolution_z];
+    
+      int incr_element(int i, int j, int k) {
+         p[i + resolution_x *( j + resolution_y * k) ] ++ ;
+         return 0;
+      }
+
+      float get_element(int i, int j, int k) {
+         return p[i + resolution_x *( j + resolution_y * k) ];
+      }
+
+      int reset() {
+         for (int i=0; i<(resolution_x*resolution_y*resolution_z); i++) {
+            p[i]=0;            
+         }
+      }
  
+
+
 };
 
 
@@ -446,12 +463,25 @@ class ElectricField {
          for (int i=0; i<Nx; i++) {
             for (int j=0; j<Ny; j++) {
                for (int k=0; k< Nz; k++) {
-                  in[i + Nx *( j + Ny * k) ] = (double)(rho->p[i + int(Nx) *( j + int(Ny) * k) ]);
+                  // poisson's equation: del^2 phi = - rho / epsilon_naught
+                  in[i + Nx *( j + Ny * k) ] = - (double)(rho->p[i + int(Nx) *( j + int(Ny) * k) ]);
                }
             }
          }
 
+         cout << "\rExecuting FFTW           " ;
+         cout.flush();
          fftw_execute(q);
+         cout << "\rFFTW done                " ;
+         cout.flush();
+
+         for (int i=0; i<out.size(); i++) {
+            if (out[i]==0) {
+            } else {
+            cout << out[i] << endl;
+            }
+         }
+
 
 
 
