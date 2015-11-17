@@ -17,8 +17,8 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 10000;
-      int tmax = 40000;
+      int N = 100000;
+      int tmax = 1510;
 
       /* box size, in km */
       float box_sizex = 100.0; //.push_back(100.00);
@@ -38,14 +38,24 @@ class Simulation {
       float wavelength_red = 500.0;
       float wavelength_green = 600.0;
       float wavelength_blue = 800.0;
+      float e_chg = 1.0; // elementary charge
       
       vector<Electron> electrons;
 
       const float m_e = 1.0;
-      float hc = 1.23984197 ; //*plank's constant in keV*nm 
+      float hc = 1.23984197 *10000; //*plank's constant in keV*nm 
 
-
-
+      float number_density(float h) {
+         return 7.86778379e6*exp(-h*0.176299767);
+      }
+      float bethe_energy_loss(float h,float v) {
+         // dE/dx due to atmospheric 'drag'
+         float effective_Z = 7.2; // 
+         float Ionization = 92.0;
+         float coeff = 4*M_PI*number_density(h)*pow(e_chg,4)*effective_Z / (m_e * pow(v,2));
+         float parenthesis= log(  2*pow(v,2) / (m_e*Ionization  )) - 1.2329;
+         return coeff*parenthesis;
+      }
 
  };
 
@@ -69,6 +79,7 @@ class OutputReport {
 
        report << "\n" ;
        report << "Interactions per life:" << (float)interactions/(float)respawns << endl;
+       report << "Interactions: " << (float)interactions << "       Respawns: "<<(float)respawns << endl;
 
        report.close();     
        return 0;
@@ -100,21 +111,48 @@ public:
    float tmp;
    
    
-   float get_p_interaction() {
-      return 0.02;
+
+   float get_p_emit_red(float x) {
+      return 
+      1.97692801419e-17 * pow(x, 8 ) + 
+     -1.24675920355e-14 * pow(x, 7 ) + 
+     2.61694799395e-12 * pow(x, 6 ) + 
+     -1.20009942187e-10 * pow(x, 5 ) + 
+     -3.03037545164e-08 * pow(x, 4 ) + 
+     4.58332800758e-06 * pow(x, 3 ) + 
+     -0.000224277684039 * pow(x, 2 ) + 
+     0.00397540318554 * pow(x, 1 ) + 
+     -0.00815824073091 * pow(x, 0 ) ;
    }
 
-
-
-
-   float get_p_emit_red() {
-      return 0.1;
+   float get_p_emit_green(float x) {
+     return 1.22309846233e-16 * pow(x, 8 ) + 
+     -1.04247753054e-13 * pow(x, 7 ) + 
+     3.62402159771e-11 * pow(x, 6 ) + 
+     -6.54860670058e-09 * pow(x, 5 ) + 
+     6.39054458804e-07 * pow(x, 4 ) + 
+     -2.94617910697e-05 * pow(x, 3 ) + 
+     0.000107184265124 * pow(x, 2 ) + 
+     0.0318371583695 * pow(x, 1 ) + 
+     0.0028840983908 * pow(x, 0 ) ;
    }
-   float get_p_emit_green() {
-      return 0.2;
+
+   float get_p_emit_blue(float x) {
+      return 
+         7.71746456929e-17 * pow(x, 8 ) + 
+        -6.74045102078e-14 * pow(x, 7 ) + 
+        2.40765868528e-11 * pow(x, 6 ) + 
+        -4.49364430269e-09 * pow(x, 5 ) + 
+        4.59098779432e-07 * pow(x, 4 ) + 
+        -2.34482985981e-05 * pow(x, 3 ) + 
+        0.000317362998942 * pow(x, 2 ) + 
+        0.0130756074812 * pow(x, 1 ) + 
+        0.00402470459253 * pow(x, 0 );
+  
    }
-   float get_p_emit_blue() {
-      return 0.7;
+   
+   float get_p_interaction(float h) {
+      return 0.4*(get_p_emit_red(h) + get_p_emit_green(h) +  get_p_emit_blue(h)) ;
    }
 
    //times that each emission should be active for  
@@ -134,8 +172,14 @@ public:
 
    int rescale_velocities() {
       //rescales the velocities to be consistent with the current kinetic energy
-      float R = E / 0.5*m_e*(vx*vx + vy*vy + vz*vz);
-
+//      cout << "BEFORE: " << vx << "  " << vy << "  " << vz << endl;
+      float R = 0.5*sim->m_e*(vx*vx + vy*vy + vz*vz) / E;
+      vx = vx/sqrt(R);
+      vy = vy/sqrt(R);
+      vz = vz/sqrt(R);
+//      cout << "BEFORE: " << vx << "  " << vy << "  " << vz << endl;
+//      cout << " " << endl;
+      
 
    }
 
@@ -144,16 +188,13 @@ public:
       t = 0;
       x = sim->box_sizex * (float)rand() / RAND_MAX;
       y = sim->box_sizey * (float)rand() / RAND_MAX;
-      z = 2*sim->box_sizez -0.0001;
+      z = 1.2*sim->box_sizez -0.0001;
       randoms = gen_random(3);
-      E = sim->E_mean * (abs(randoms[0])+1.0);
-//      cout << sim->E_mean << "*" << "(" << randoms[0]<<"+1.0) = " << E << endl; 
-      vx = (0.01 * sqrt(2*E/sim->m_e) * randoms[1]);
-      vy = (0.01 * sqrt(2*E/sim->m_e) * randoms[2]);
+      E = 1000*sim->E_mean * (abs(randoms[0])+1.0);
+      vx = (0.0001 * sqrt(2*E/sim->m_e) * randoms[1]);
+      vy = (0.0001 * sqrt(2*E/sim->m_e) * randoms[2]);
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
-      vz = -sqrt( 2*E / sim->m_e - tmp   ) / sim->dt;
-//      cout << "!  " <<  vx << "\t" << vy << "\t" << vz << "\t" << tmp << endl;
-//      E = 0.5 * sim->m_e * (pow(vx,2) + pow(vy,2) + pow(vz, 2));
+      vz = -sqrt( 2*E / sim->m_e - tmp   ) ;
       emitting = 0;
       emitting_time_left = 0;
       emitting_wavelength = 0;
@@ -193,8 +234,8 @@ class PhotonDensity {
       }
 
    
-      int incr_element(float *A ,int i, int j, int k) {
-         A[i + resolution_x *( j + resolution_y * k) ]++;
+      int incr_element(float *A ,int i, int j, int k,float n) {
+         A[i + resolution_x *( j + resolution_y * k) ]+=n;
          return 0;
       }
 
@@ -327,12 +368,12 @@ class PhotonDensity {
 
 class MagneticField {
    public:
-      float strength = 1000.0;
+      float strength = 10.0;
 
       vector<float> at(float t,float x,float y,float z){
          vector<float> r;
-         r.push_back(strength*sin(x-50)/(x-50));
-         r.push_back(strength*sin(x-50)/(x-50));
+         r.push_back((strength*sin(x-50)/(x-50)));
+         r.push_back((strength*sin(x-50)/(x-50)));
          r.push_back(0);
          return r;
       }
