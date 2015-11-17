@@ -8,7 +8,6 @@
 #include <stdio.h>      /* printf, NULL */
 #include <stdlib.h>     /* srand, rand */
 
-#include "testing.cpp"
 #include "utility_functions.h"
 #include "data_structure.h"
 
@@ -23,6 +22,8 @@ int main() {
    PhotonDensity photon_density;
    OutputReport report;
    MagneticField mag_field;
+   ChargeDensity rho;
+   ElectricField E_field;
    
    unsigned int voxelx,voxely,voxelz;
 
@@ -80,9 +81,10 @@ int main() {
           && e->x <= sim.box_sizex
           && e->y >= 0
           && e->y <= sim.box_sizey    ) {
+         
+         e->calculate_probabilities(e->z);
 
          rnd = (float)rand()/RAND_MAX;
-         e->calculate_probabilities(e->z);
          if (rnd < e->p_emit) {
             e->interaction_count++;
             rnd = (float)rand()/RAND_MAX;
@@ -108,6 +110,7 @@ int main() {
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
             e->E -= sim.hc / e->emitting_wavelength;
+            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==3) {
                report.EvsT.push_back(e->E);
@@ -122,11 +125,14 @@ int main() {
 
 
             if (e->emitting_wavelength == sim.wavelength_red ) {
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,1) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*1.0) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152*79.0/255.0) ;
             } else if (e->emitting_wavelength == sim.wavelength_green ) {
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,1) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*189.0/255.0) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
             } else if (e->emitting_wavelength == sim.wavelength_blue ) {
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,1) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*70./255.) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
             }
 
             
@@ -170,7 +176,7 @@ int main() {
          e->y += e->vy * sim.dt;
          e->z += e->vz * sim.dt;
          
-if (e->ID==3) cout << p_emit_r << "  " << p_emit_g << "  " << p_emit_b << "  "<< p_emit << endl;
+if (e->ID==3) cout << endl << e->z << "   "  << e->p_emit_r << "  " << e->p_emit_g << "  " << e->p_emit_b << "  "<< e->p_emit ;
         
 //         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\tE: " << e->E << "\n" ;
 //         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
@@ -200,7 +206,7 @@ report.write("output/report.log");
 
 
 
-
+cout << "\n\n" << endl;
 
 return 0;
 }
