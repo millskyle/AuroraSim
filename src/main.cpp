@@ -49,7 +49,7 @@ int main() {
    cout << endl;
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
-      if (t%500==0) {
+      if (t%1000==0) {
          photon_density.write_image(t);
          photon_density.reset();
 
@@ -65,27 +65,32 @@ int main() {
          Electron* e = &sim.electrons[i]; //make a pointer to the electron we're dealing with
            //if electron has left the cell, or has not enough energy remaining, we're done tracking it.
          //Reset it.
-         while (  e->x <= 0 || e->x >= sim.box_sizex
-            || e->y <= 0 || e->y >= sim.box_sizey
-            || e->z <= 0 //|| e->z >= sim.box_sizez
+         while (  //e->x <= 0 || e->x >= sim.box_sizex
+          //  || e->y <= 0 || e->y >= sim.box_sizey
+           // || 
+            e->z <= 0 //|| e->z >= sim.box_sizez
             || e->E <= (sim.hc / e->sim->wavelength_red ) ) {
             e->reset();
             e->t = t;
          }
         
 
-        if (e->z < sim.box_sizez) {
+        if ( e->z < sim.box_sizez 
+          && e->x >= 0 
+          && e->x <= sim.box_sizex
+          && e->y >= 0
+          && e->y <= sim.box_sizey    ) {
 
          rnd = (float)rand()/RAND_MAX;
-         if (rnd < e->get_p_interaction() ) {
+         if (rnd < e->get_p_interaction( e->z ) ) {
             e->interaction_count++;
             rnd = (float)rand()/RAND_MAX;
-            if (rnd < e->get_p_emit_red()) {
+            if (rnd < e->get_p_emit_red(e->z)) {
                //emit red
                e->emitting = 1;
                e->emitting_time_left = e->get_t_emit_red();
                e->emitting_wavelength = sim.wavelength_red;
-            } else if (rnd < (e->get_p_emit_red() + e->get_p_emit_green()) ) {
+            } else if (rnd < (e->get_p_emit_red(e->z) + e->get_p_emit_green(e->z)) ) {
                //emit green
                e->emitting = 1;
                e->emitting_time_left = e->get_t_emit_green();
@@ -116,11 +121,11 @@ int main() {
 
 
             if (e->emitting_wavelength == sim.wavelength_red ) {
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,1) ;
             } else if (e->emitting_wavelength == sim.wavelength_green ) {
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,1) ;
             } else if (e->emitting_wavelength == sim.wavelength_blue ) {
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,1) ;
             }
 
             
@@ -132,7 +137,14 @@ int main() {
 
         }
 
+
+         
+         e->rescale_velocities();
+
+
          //add any applicable forces to e->Fx, e->Fy, e->Fz :
+
+         //rescale the velocities according to the new energy
 
          randoms = gen_random(3);
 
@@ -140,9 +152,9 @@ int main() {
 
 //         cout << B[0] << " " << B[1] << "  " << B[2]  << endl;
 
-         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 100. ;
-         e->Fy += (e->vz * B[0] - e->vx * B[2]) /100. ;
-         e->Fz += (e->vx * B[1] - e->vy * B[0]) /100.;
+         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1000. ;
+         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1000. ;
+         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1000.;
 
          
          //Perform equation of motion integration:
@@ -151,12 +163,15 @@ int main() {
          e->vy += 0.5 * (e->Fy / sim.m_e) * sim.dt ;
          e->vz += 0.5 * (e->Fz / sim.m_e) * sim.dt ;
 
+         //e->E-= sim.bethe_energy_loss(e->z, sqrt(e->vx*e->vx + e->vy*e->vy + e->vz*e->vx))*e->vz * sim.dt ;
+
          e->x += e->vx * sim.dt;
          e->y += e->vy * sim.dt;
          e->z += e->vz * sim.dt;
+         
 
         
-//         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ;
+//         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\tE: " << e->E << "\n" ;
 //         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
 
 //         cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ; 
