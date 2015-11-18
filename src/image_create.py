@@ -16,6 +16,7 @@ plt.figure(figsize=(w/20,h/20))
 
 y = np.reshape(x, (h,w,3)) * 255
 
+
 plt.imshow(y,origin='lower',extent=(0,w,0,h))
 plt.savefig('output.png')
 

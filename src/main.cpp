@@ -7,6 +7,7 @@
 #include <time.h>
 #include <stdio.h>      /* printf, NULL */
 #include <stdlib.h>     /* srand, rand */
+#include <fftw3.h>
 
 #include "utility_functions.h"
 #include "data_structure.h"
@@ -24,6 +25,7 @@ int main() {
    MagneticField mag_field;
    ChargeDensity rho;
    ElectricField E_field;
+   E_field.init(&sim, &rho);
    
    unsigned int voxelx,voxely,voxelz;
 
@@ -50,7 +52,7 @@ int main() {
    cout << endl;
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
-      if (t%1000==0) {
+      if (t%100==0) {
          photon_density.write_image(t);
          photon_density.reset();
 
@@ -75,6 +77,9 @@ int main() {
             e->t = t;
          }
         
+        voxelx = int((float)photon_density.resolution_x / (float)sim.box_sizex * e->x);
+        voxely = int((float)photon_density.resolution_y / (float)sim.box_sizey * e->y);
+        voxelz = int((float)photon_density.resolution_z / (float)sim.box_sizez * e->z);
 
         if ( e->z < sim.box_sizez 
           && e->x >= 0 
@@ -118,12 +123,6 @@ int main() {
             e->emitting_time_left -= 1;
             
 
-            voxelx = int((float)photon_density.resolution_x / (float)sim.box_sizex * e->x);
-            voxely = int((float)photon_density.resolution_y / (float)sim.box_sizey * e->y);
-            voxelz = int((float)photon_density.resolution_z / (float)sim.box_sizez * e->z);
-            
-
-
             if (e->emitting_wavelength == sim.wavelength_red ) {
                 photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*1.0) ;
                 photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152*79.0/255.0) ;
@@ -144,6 +143,13 @@ int main() {
 
         }
 
+        voxelx = int((float)rho.resolution_x / (float)sim.box_sizex * e->x);
+        voxely = int((float)rho.resolution_y / (float)sim.box_sizey * e->y);
+        voxelz = int((float)rho.resolution_z / (float)sim.box_sizez * e->z);
+         
+        rho.incr_element(voxelx,voxely,voxelz);   
+
+
 
          
          e->rescale_velocities();
@@ -163,6 +169,10 @@ int main() {
          e->Fy += (e->vz * B[0] - e->vx * B[2]) /1000. ;
          e->Fz += (e->vx * B[1] - e->vy * B[0]) /1000.;
 
+         e->Fx += (sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
+         e->Fy += (sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
+         e->Fz += (sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
+
          
          //Perform equation of motion integration:
 
@@ -176,7 +186,7 @@ int main() {
          e->y += e->vy * sim.dt;
          e->z += e->vz * sim.dt;
          
-if (e->ID==3) cout << endl << e->z << "   "  << e->p_emit_r << "  " << e->p_emit_g << "  " << e->p_emit_b << "  "<< e->p_emit ;
+//if (e->ID==3) cout << endl << e->z << "   "  << e->p_emit_r << "  " << e->p_emit_g << "  " << e->p_emit_b << "  "<< e->p_emit ;
         
 //         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\tE: " << e->E << "\n" ;
 //         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
@@ -186,6 +196,11 @@ if (e->ID==3) cout << endl << e->z << "   "  << e->p_emit_r << "  " << e->p_emit
          
          
       }
+
+      cout << "Computing electric field                  " << endl ;
+      cout.flush();
+      E_field.compute();
+      rho.reset();
 
    }
 

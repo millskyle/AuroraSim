@@ -18,7 +18,7 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 100000;
+      int N = 10000;
       int tmax = 1000;
 
       /* box size, in km */
@@ -410,9 +410,9 @@ class MagneticField {
 
 class ChargeDensity {
    public:
-      int resolution_x = 100;
-      int resolution_y = 100;
-      int resolution_z = 200;
+      int resolution_x = 50;
+      int resolution_y = 50;
+      int resolution_z = 100;
 
       float *p = new float[resolution_x*resolution_y*resolution_z];
     
@@ -438,16 +438,42 @@ class ChargeDensity {
 
 class ElectricField {
    public:
-   
-      int compute(Simulation *sim, ChargeDensity *rho) {
+      int Nx;
+      int Ny;
+      int Nz;
 
-         int Nx = rho->resolution_x ;
-         int Ny = rho->resolution_y ;
-         int Nz = rho->resolution_z ;
+      float Lx;
+      float Ly;
+      float Lz;
+      Simulation *sim;
+      ChargeDensity *rho;
+      float *Ex = new float[Nx*Ny*Nz];
+      float *Ey = new float[Nx*Ny*Nz];
+      float *Ez = new float[Nx*Ny*Nz];
+
+      int init(Simulation *simm, ChargeDensity *rhoo) {
+         sim = simm;
+         rho = rhoo;
+         Nx = rho->resolution_x ;
+         Ny = rho->resolution_y ;
+         Nz = rho->resolution_z ;
+         Lx = sim->box_sizex ; 
+         Ly = sim->box_sizey ;
+         Lz = sim->box_sizez ;
+      }
+
+
+      int update_element(float* A, int i, int j, int k, float val) {
+         A[i + Nx *( j + Ny * k) ] = val ;
+         return 0;
+      }
+      int get_element(float* A, int i, int j, int k) {
+         return A[i + Nx *( j + Ny * k) ] ;
+      }
+   
+      int compute() {
+
          
-         float Lx = sim->box_sizex ; 
-         float Ly = sim->box_sizey ;
-         float Lz = sim->box_sizez ;
          
          float dx = Lx/float(Nx-1) ;
          float dy = Ly/float(Ny-1) ;
@@ -455,6 +481,9 @@ class ElectricField {
    
          vector<double> in(Nx*Ny*Nz, 0);
          vector<double> out(Nx*Ny*Nz, 0);
+         
+         float *phi = new float[Nx*Ny*Nz];
+         
 
          fftw_plan q;
 
@@ -469,18 +498,60 @@ class ElectricField {
             }
          }
 
-         cout << "\rExecuting FFTW           " ;
+         cout << "Executing FFTW           " <<endl;
          cout.flush();
          fftw_execute(q);
-         cout << "\rFFTW done                " ;
+         cout << "FFTW done                " << endl ;
          cout.flush();
 
-         for (int i=0; i<out.size(); i++) {
+/*         for (int i=0; i<out.size(); i++) {
             if (out[i]==0) {
             } else {
             cout << out[i] << endl;
             }
          }
+*/
+         for (int i=0; i<Nx; i++) {
+            for (int j=0; j<Ny; j++) {
+               for (int k=0; k< Nz; k++) {
+                  // poisson's equation: del^2 phi = - rho / epsilon_naught
+                  phi[i + Nx *( j + Ny * k) ]  =  (float)out[i + Nx *( j + Ny * k) ];
+               }
+            }
+         }
+
+
+
+
+
+
+         float tmp0;
+         float tmp1;
+
+//cout << phi[0] << endl;
+//cout << out[0] << endl;
+
+         for (int i=1; i<Nx-1; i++) {
+            for (int j=1; j<Ny-1; j++) {
+               for (int k=1; k<Nz-1; k++) {
+
+//         cout << "HETERERERAKSEJRHASHDKLA"<< endl<<endl;
+  //                cout << "tmp0 = get_element(phi,"<< i-1 << "," << j << "," << k <<");" << endl;
+                  tmp0 = get_element(phi, i-1, j, k);
+                  tmp1 = get_element(phi, i+1, j, k); 
+                  update_element(Ex, i, j, k,  (tmp0-tmp1)/(2*dx)      );
+                  
+                  tmp0 = get_element(phi, i, j-1, k);
+                  tmp1 = get_element(phi, i, j+1, k); 
+                  update_element(Ey, i, j, k,  (tmp0-tmp1)/(2*dy)      );
+                  
+                  tmp0 = get_element(phi, i, j, k-1);
+                  tmp1 = get_element(phi, i, j, k+1); 
+                  update_element(Ez, i, j, k,  (tmp0-tmp1)/(2*dz)      );
+               }
+            }
+         }
+
 
 
 
