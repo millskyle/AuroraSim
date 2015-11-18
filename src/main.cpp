@@ -52,7 +52,7 @@ int main() {
    cout << endl;
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
-      if (t%100==0) {
+      if (t%1000==0) {
          photon_density.write_image(t);
          photon_density.reset();
 
@@ -143,16 +143,18 @@ int main() {
 
         }
 
-        voxelx = int((float)rho.resolution_x / (float)sim.box_sizex * e->x);
+
+        e->rescale_velocities();
+       
+        voxelx = int((float)rho.resolution_x / (float)sim.box_sizex * e->x); 
         voxely = int((float)rho.resolution_y / (float)sim.box_sizey * e->y);
         voxelz = int((float)rho.resolution_z / (float)sim.box_sizez * e->z);
+       
+        if (voxelx >= 0 && voxelx>=rho.resolution_x && voxely >= 0 && voxely>=rho.resolution_y && voxelz >= 0 && voxelz>=rho.resolution_z) {
+
+        rho.incr_element(voxelx,voxely,voxelz);  
+        }
          
-        rho.incr_element(voxelx,voxely,voxelz);   
-
-
-
-         
-         e->rescale_velocities();
 
 
          //add any applicable forces to e->Fx, e->Fy, e->Fz :
@@ -169,12 +171,21 @@ int main() {
          e->Fy += (e->vz * B[0] - e->vx * B[2]) /1000. ;
          e->Fz += (e->vx * B[1] - e->vy * B[0]) /1000.;
 
+//         cout << "F_Bx = " << (e->vy * B[2] - e->vz * B[1]) / 1000. << endl;
+         
+
          e->Fx += (sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
          e->Fy += (sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
          e->Fz += (sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
 
+//         if (abs(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz)) >0 ) {
+//            cout << "F_Ex=" << (sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz)) << endl;
+//         }
          
          //Perform equation of motion integration:
+
+
+         
 
          e->vx += 0.5 * (e->Fx / sim.m_e) * sim.dt ;
          e->vy += 0.5 * (e->Fy / sim.m_e) * sim.dt ;

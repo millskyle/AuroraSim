@@ -215,7 +215,7 @@ public:
       t = 0;
       x = sim->box_sizex * (float)rand() / RAND_MAX;
       y = sim->box_sizey * (float)rand() / RAND_MAX;
-      z = 0.9*sim->box_sizez -0.0001;
+      z = 0.95*sim->box_sizez -0.0001;
       randoms = gen_random(3);
       E = 1000*sim->E_mean * (abs(randoms[0])+1.0);
       vx = (0.0001 * sqrt(2*E/sim->m_e) * randoms[1]);
@@ -410,9 +410,9 @@ class MagneticField {
 
 class ChargeDensity {
    public:
-      int resolution_x = 50;
-      int resolution_y = 50;
-      int resolution_z = 100;
+      int resolution_x = 40;
+      int resolution_y = 40;
+      int resolution_z = 80;
 
       float *p = new float[resolution_x*resolution_y*resolution_z];
     
@@ -467,8 +467,12 @@ class ElectricField {
          A[i + Nx *( j + Ny * k) ] = val ;
          return 0;
       }
-      int get_element(float* A, int i, int j, int k) {
-         return A[i + Nx *( j + Ny * k) ] ;
+      float get_element(float* A, int i, int j, int k) {
+         if ( i >= 0 && i < Nx && j >= 0 && j < Ny && k>=0 && k < Nz ) {
+            return A[i + Nx *( j + Ny * k) ] ;
+         } else {
+            return 0;
+         }
       }
    
       int compute() {
@@ -498,7 +502,7 @@ class ElectricField {
             }
          }
 
-         cout << "Executing FFTW           " <<endl;
+         cout << "Executing FFTW to find scalar potential field          " <<endl;
          cout.flush();
          fftw_execute(q);
          cout << "FFTW done                " << endl ;
@@ -556,55 +560,10 @@ class ElectricField {
 
 
 
+cout << "Finished computing E" <<endl;
 }
 
          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
