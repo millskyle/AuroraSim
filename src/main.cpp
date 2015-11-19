@@ -119,7 +119,7 @@ int main() {
             e->E -= sim.hc / e->emitting_wavelength;
             e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
-            if(e->ID==3) {
+            if(e->ID==0) {
                report.EvsT.push_back(e->E);
             }
             e->emitting_time_left -= 1;
@@ -183,9 +183,9 @@ int main() {
 //         cout << "F_Bx = " << (e->vy * B[2] - e->vz * B[1]) / 1000. << endl;
          
 
-         e->Fx += 10000*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
-         e->Fy += 10000*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
-         e->Fz += 10000*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
+         e->Fx += 10*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
+         e->Fy += 10*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
+         e->Fz += 10*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
 
 /*         if ( e->ID == 4 ) {
             cout << "x=" << e->x << "    ey="<<e->y<<"      ez="<<e->z << endl;
@@ -212,8 +212,8 @@ int main() {
          
 //if (e->ID==3) cout << endl << e->z << "   "  << e->p_emit_r << "  " << e->p_emit_g << "  " << e->p_emit_b << "  "<< e->p_emit ;
         
-//         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\tE: " << e->E << "\n" ;
-//         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
+         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\tE: " << e->E << "\n" ;
+         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
 
 //         cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ; 
 //         cout << e->vx << "\t" << e->vy << "\t" << e->vz << "\n" ; 
@@ -236,9 +236,9 @@ photon_density.write_image(t);
 debug_xyz.close();
 
 
-report.interactions = sim.electrons[2].interaction_count;
-report.respawns = sim.electrons[2].respawn_count;
-report.write("output/report.log");
+//report.interactions = sim.electrons[2].interaction_count;
+//report.respawns = sim.electrons[2].respawn_count;
+//report.write("output/report.log");
 
 
 
