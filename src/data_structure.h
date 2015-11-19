@@ -215,8 +215,8 @@ public:
    
    int reset() {
       t = 0;
-      x = sim->box_sizex * (sin(2*M_PI*(float)rand() / RAND_MAX)/2.0 + 0.5);
-      y = sim->box_sizey * (sin(2*M_PI*(float)rand() / RAND_MAX)/2.0 + 0.5);
+      x = sim->box_sizex *(float)rand() / RAND_MAX;
+      y = sim->box_sizey* (float)rand() / RAND_MAX;
       z = 1.1*sim->box_sizez -0.0001;
       randoms = gen_random(3);
       E = 1000*sim->E_mean * (abs(randoms[0])+1.0);
@@ -241,9 +241,9 @@ class PhotonDensity {
 
 
    public:
-      unsigned int resolution_x = 250; //divisions along the box dimension
-      unsigned int resolution_y = 250;
-      unsigned int resolution_z = 500;
+      int resolution_x = 250; //divisions along the box dimension
+      int resolution_y = 250;
+      int resolution_z = 500;
 
       float optical_decay_power = 2.0; //light intensity drops off as distance to this power (vacuum would be 2.0) 
 
@@ -374,7 +374,6 @@ class PhotonDensity {
 
            }
         }
-       cout << "HERE" << endl; 
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
               img << Rflat[k*resolution_y + j]/maxpixelsumR << " "
@@ -529,8 +528,8 @@ class ElectricField {
             for (int j=0; j<Ny; j++) {
                for (int k=0; k<Nz; k++) {
                   //flip the real and imaginary parts
-                  in2[i + Nx *( j + Ny * k)][1] = -i*j*k*out[i + Nx *( j + Ny * k)][0] / ((double)i*i+j*j+k*k+1e-16);
-                  in2[i + Nx *( j + Ny * k)][0] =i*j*k* out[i + Nx *( j + Ny * k)][1] / (i*i+j*j+k*k+1e-16);
+                  in2[i + Nx *( j + Ny * k)][0] = -out[i + Nx *( j + Ny * k)][0] / ((double)i*i+j*j+k*k+1e-16);
+                  in2[i + Nx *( j + Ny * k)][1] = -out[i + Nx *( j + Ny * k)][1] / (i*i+j*j+k*k+1e-16);
                }
             }
          }
