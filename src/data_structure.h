@@ -19,7 +19,7 @@ class Electron ;
 class Simulation {
    public: 
       int N = 10000;
-      int tmax = 1000;
+      int tmax = 100;
 
       /* box size, in km */
       float box_sizex = 100.0; //.push_back(100.00);
@@ -33,9 +33,11 @@ class Simulation {
       
       float E_low_threshold = 10; 
       
-      int timescale_red_emission = 110/dt;
-      int timescale_green_emission = 0.7/dt;
-      int timescale_blue_emission = 0.001/dt;
+      int timescale_red_emission = 50.; //110/dt;
+      int timescale_green_emission = 50.;// 0.7/dt;
+      int timescale_blue_emission = 50.;// 0.001/dt;
+
+
       float wavelength_red = 500.0;
       float wavelength_green = 600.0;
       float wavelength_blue = 800.0;
@@ -213,9 +215,9 @@ public:
    
    int reset() {
       t = 0;
-      x = sim->box_sizex * (float)rand() / RAND_MAX;
-      y = sim->box_sizey * (float)rand() / RAND_MAX;
-      z = 0.95*sim->box_sizez -0.0001;
+      x = sim->box_sizex * (sin(2*M_PI*(float)rand() / RAND_MAX)/2.0 + 0.5);
+      y = sim->box_sizey * (sin(2*M_PI*(float)rand() / RAND_MAX)/2.0 + 0.5);
+      z = 1.1*sim->box_sizez -0.0001;
       randoms = gen_random(3);
       E = 1000*sim->E_mean * (abs(randoms[0])+1.0);
       vx = (0.0001 * sqrt(2*E/sim->m_e) * randoms[1]);
@@ -372,7 +374,7 @@ class PhotonDensity {
 
            }
         }
-        
+       cout << "HERE" << endl; 
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
               img << Rflat[k*resolution_y + j]/maxpixelsumR << " "
@@ -396,7 +398,7 @@ class PhotonDensity {
 
 class MagneticField {
    public:
-      float strength = 1.0;
+      float strength = 10000.0;
 
       vector<float> at(float t,float x,float y,float z){
          vector<float> r;
@@ -477,36 +479,40 @@ class ElectricField {
    
       int compute() {
 
-         
-         
          float dx = Lx/float(Nx-1) ;
          float dy = Ly/float(Ny-1) ;
          float dz = Lz/float(Nz-1) ;
-   
-         vector<double> in(Nx*Ny*Nz, 0);
-         vector<double> out(Nx*Ny*Nz, 0);
-         
+
+         fftw_complex *in = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *out = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *in2 = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *out2 = new fftw_complex[Nx*Ny*Nz];
+
          float *phi = new float[Nx*Ny*Nz];
-         
+         double elem[2] = {0};
 
-         fftw_plan q;
+         fftw_plan forward;
+         fftw_plan inverse;
 
-         q = fftw_plan_r2r_3d(Nx,Ny,Nz,in.data(), out.data(), FFTW_REDFT00, FFTW_REDFT00, FFTW_REDFT00, 0 );
+         forward = fftw_plan_dft_3d(Nx,Ny,Nz,in, out, FFTW_FORWARD, FFTW_MEASURE );
+         inverse = fftw_plan_dft_3d(Nx,Ny,Nz,in2, out2, FFTW_BACKWARD, FFTW_MEASURE );
          
          for (int i=0; i<Nx; i++) {
             for (int j=0; j<Ny; j++) {
                for (int k=0; k< Nz; k++) {
                   // poisson's equation: del^2 phi = - rho / epsilon_naught
-                  in[i + Nx *( j + Ny * k) ] = - (double)(rho->p[i + int(Nx) *( j + int(Ny) * k) ]);
+                  elem[1]=0;
+                  elem[0] = - (double)(rho->p[i + int(Nx) *( j + int(Ny) * k) ]);
+//                  if (elem[0]!=0){ cout << elem[0] << " ";}
+                  in[i + Nx *( j + Ny * k) ][0] = elem[0];
+                  in[i + Nx *( j + Ny * k)][1] = elem[1];
                }
             }
          }
 
-         cout << "Executing FFTW to find scalar potential field          " <<endl;
+         cout << "\rComputing forward FFT          " ;
          cout.flush();
-         fftw_execute(q);
-         cout << "FFTW done                " << endl ;
-         cout.flush();
+         fftw_execute(forward);
 
 /*         for (int i=0; i<out.size(); i++) {
             if (out[i]==0) {
@@ -515,11 +521,41 @@ class ElectricField {
             }
          }
 */
+
+         cout << "\rComputing inverse FFT                " ;
+         cout.flush();
+
+         for (int i=0; i<Nx; i++) {
+            for (int j=0; j<Ny; j++) {
+               for (int k=0; k<Nz; k++) {
+                  //flip the real and imaginary parts
+                  in2[i + Nx *( j + Ny * k)][1] = -i*j*k*out[i + Nx *( j + Ny * k)][0] / ((double)i*i+j*j+k*k+1e-16);
+                  in2[i + Nx *( j + Ny * k)][0] =i*j*k* out[i + Nx *( j + Ny * k)][1] / (i*i+j*j+k*k+1e-16);
+               }
+            }
+         }
+
+         fftw_execute(inverse);
+
+         cout << "\rFFTW done                " ;
+         cout.flush();
+
+
+
+
+
+
+
+
          for (int i=0; i<Nx; i++) {
             for (int j=0; j<Ny; j++) {
                for (int k=0; k< Nz; k++) {
                   // poisson's equation: del^2 phi = - rho / epsilon_naught
-                  phi[i + Nx *( j + Ny * k) ]  =  (float)out[i + Nx *( j + Ny * k) ];
+                  phi[i + Nx *( j + Ny * k) ]  =  (float)out2[i + Nx *( j + Ny * k) ][0];
+  //                if (phi[i + Nx *( j + Ny * k) ]==0) {
+//                  }else{
+//                     cout << phi[i + Nx *( j + Ny * k) ] << "  " ;
+//                  }
                }
             }
          }
@@ -560,7 +596,7 @@ class ElectricField {
 
 
 
-cout << "Finished computing E" <<endl;
+cout << "\rFinished computing E" ;
 }
 
          
