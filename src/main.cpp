@@ -60,7 +60,7 @@ int main() {
 
 
       if (t%5==0) { 
-         cout << "\r   t = " << t << "                                                    ";
+         cout << "\r                                        t = " << t << "     ";
          cout.flush(); 
       }
  
@@ -71,8 +71,10 @@ int main() {
          while (  //e->x <= 0 || e->x >= sim.box_sizex
           //  || e->y <= 0 || e->y >= sim.box_sizey
            // || 
-            e->z <= 0 //|| e->z >= sim.box_sizez
-            || e->E <= (sim.hc / e->sim->wavelength_red ) ) {
+            e->z!=e->z 
+            ||e->z <= 0 //|| e->z >= sim.box_sizez
+            || e->E <= (sim.hc / e->sim->wavelength_red ) ) 
+          {
             e->reset();
             e->t = t;
          }
@@ -150,9 +152,16 @@ int main() {
         voxely = int((float)rho.resolution_y / (float)sim.box_sizey * e->y);
         voxelz = int((float)rho.resolution_z / (float)sim.box_sizez * e->z);
        
-        if (voxelx >= 0 && voxelx>=rho.resolution_x && voxely >= 0 && voxely>=rho.resolution_y && voxelz >= 0 && voxelz>=rho.resolution_z) {
-
+        if (
+             voxelx >= 0 
+          && voxelx<=rho.resolution_x 
+          && voxely >= 0 
+          && voxely<=rho.resolution_y 
+          && voxelz >= 0 
+          && voxelz<=rho.resolution_z) {
+        
         rho.incr_element(voxelx,voxely,voxelz);  
+        
         }
          
 
@@ -167,20 +176,24 @@ int main() {
 
 //         cout << B[0] << " " << B[1] << "  " << B[2]  << endl;
 
-         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1000. ;
-         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1000. ;
-         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1000.;
+         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 10000000. ;
+         e->Fy += (e->vz * B[0] - e->vx * B[2]) /10000000. ;
+         e->Fz += (e->vx * B[1] - e->vy * B[0]) /10000000.;
 
 //         cout << "F_Bx = " << (e->vy * B[2] - e->vz * B[1]) / 1000. << endl;
          
 
-         e->Fx += (sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
-         e->Fy += (sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
-         e->Fz += (sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
+         e->Fx += 10000*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
+         e->Fy += 10000*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
+         e->Fz += 10000*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
 
-//         if (abs(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz)) >0 ) {
-//            cout << "F_Ex=" << (sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz)) << endl;
-//         }
+/*         if ( e->ID == 4 ) {
+            cout << "x=" << e->x << "    ey="<<e->y<<"      ez="<<e->z << endl;
+            cout << "F_Ex=" <<E_field.get_element(E_field.Ex,voxelx,voxely,voxelz) << endl;
+            cout << "F_Bx=" << (e->vy * B[2] - e->vz * B[1]) / 100. << endl;
+         }
+*/
+         //cout << "F_Ex=" << (sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz)) << endl;
          
          //Perform equation of motion integration:
 
@@ -208,7 +221,7 @@ int main() {
          
       }
 
-      cout << "Computing electric field                  " << endl ;
+      cout << "\rComputing electric field                  "  ;
       cout.flush();
       E_field.compute();
       rho.reset();
