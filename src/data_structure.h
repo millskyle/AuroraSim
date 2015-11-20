@@ -18,8 +18,8 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 10000;
-      int tmax = 100;
+      int N = 1000;
+      int tmax = 1000;
 
       /* box size, in km */
       float box_sizex = 100.0; //.push_back(100.00);
@@ -214,16 +214,27 @@ public:
 
    
    int reset() {
+      if (ID==3) {
+         cout << "Respawning" << endl;
+         cout << "  at respawn: Fx=" << Fx << "   Fy=" << Fy << "   Fz="<<Fz << endl;
+         cout << "  at respawn:  x=" <<  x << "    y=" <<  y << "    z="<< z << endl;
+      }
       t = 0;
       x = sim->box_sizex *(float)rand() / RAND_MAX;
       y = sim->box_sizey* (float)rand() / RAND_MAX;
-      z = 1.1*sim->box_sizez -0.0001;
+
+      x = 50.0;
+      y = 50.0;
+
+
+      z = 0.1 * sim->box_sizez* (float)rand() / RAND_MAX + 0.9*sim->box_sizez;
+      //z = 1.1*sim->box_sizez -0.0001;
       randoms = gen_random(3);
       E = 1000*sim->E_mean * (abs(randoms[0])+1.0);
       vx = (0.0001 * sqrt(2*E/sim->m_e) * randoms[1]);
       vy = (0.0001 * sqrt(2*E/sim->m_e) * randoms[2]);
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
-      vz = -sqrt( 2*E / sim->m_e - tmp   ) ;
+      vz = -sqrt( 2*E / sim->m_e - tmp ) ;
       emitting = 0;
       emitting_time_left = 0;
       emitting_wavelength = 0;
@@ -231,6 +242,7 @@ public:
       Fy = 0; 
       Fz = 0;
       respawn_count +=1;
+
    }
 
 
@@ -397,12 +409,14 @@ class PhotonDensity {
 
 class MagneticField {
    public:
-      float strength = 10000.0;
+      float strength = 1000.0;
 
       vector<float> at(float t,float x,float y,float z){
          vector<float> r;
-         r.push_back((strength*sin(x-50)/(x-50)));
-         r.push_back((strength*sin(x-50)/(x-50)));
+//         r.push_back((strength*sin(x-50)/(x-50)));
+//         r.push_back((strength*sin(x-50)/(x-50)));
+         r.push_back(strength);
+         r.push_back(strength);
          r.push_back(0);
          return r;
       }
@@ -438,6 +452,7 @@ class ChargeDensity {
 
 
 class ElectricField {
+
    public:
       int Nx;
       int Ny;
@@ -509,8 +524,6 @@ class ElectricField {
             }
          }
 
-         cout << "\rComputing forward FFT          " ;
-         cout.flush();
          fftw_execute(forward);
 
 /*         for (int i=0; i<out.size(); i++) {
@@ -521,23 +534,19 @@ class ElectricField {
          }
 */
 
-         cout << "\rComputing inverse FFT                " ;
-         cout.flush();
 
          for (int i=0; i<Nx; i++) {
             for (int j=0; j<Ny; j++) {
                for (int k=0; k<Nz; k++) {
                   //flip the real and imaginary parts
-                  in2[i + Nx *( j + Ny * k)][0] = -out[i + Nx *( j + Ny * k)][0] / ((double)i*i+j*j+k*k+1e-16);
-                  in2[i + Nx *( j + Ny * k)][1] = -out[i + Nx *( j + Ny * k)][1] / (i*i+j*j+k*k+1e-16);
+                  in2[i + Nx *( j + Ny * k)][1] = -sqrt(i*i + j*j + k*k)*out[i + Nx *( j + Ny * k)][0] / ((double)i*i+j*j+k*k+1e-16);
+                  in2[i + Nx *( j + Ny * k)][0] = -sqrt(i*i + j*j + k*k) * out[i + Nx *( j + Ny * k)][1] / (i*i+j*j+k*k+1e-16);
                }
             }
          }
 
          fftw_execute(inverse);
 
-         cout << "\rFFTW done                " ;
-         cout.flush();
 
 
 
@@ -595,7 +604,6 @@ class ElectricField {
 
 
 
-cout << "\rFinished computing E" ;
 }
 
          

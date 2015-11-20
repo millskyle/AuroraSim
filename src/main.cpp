@@ -17,7 +17,7 @@ using namespace std;
 
 
 int main() {
-   //srand ( time(NULL));
+   srand ( time(NULL));
    vector<float> randoms;
    Simulation sim;
    PhotonDensity photon_density;
@@ -52,27 +52,28 @@ int main() {
    cout << endl;
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
-      if (t%1000==0) {
+      if (t%10000==0) {
          photon_density.write_image(t);
          photon_density.reset();
 
       }
 
 
-      if (t%5==0) { 
-         cout << "\r                                        t = " << t << "     ";
+   /*   if (t%5==0) { 
+          cout << "\r                                             " ;
+         cout << "t = " << t << "     ";
+          cout << endl;
          cout.flush(); 
       }
+      */
  
       for (int i=0; i<sim.N ; i++) {
          Electron* e = &sim.electrons[i]; //make a pointer to the electron we're dealing with
            //if electron has left the cell, or has not enough energy remaining, we're done tracking it.
          //Reset it.
-         while (  //e->x <= 0 || e->x >= sim.box_sizex
-          //  || e->y <= 0 || e->y >= sim.box_sizey
-           // || 
-            e->z!=e->z 
-            ||e->z <= 0 //|| e->z >= sim.box_sizez
+         while (  
+            e->z!=e->z //(that will evaluate true if e->z == nan) 
+            ||e->z <= 0 
             || e->E <= (sim.hc / e->sim->wavelength_red ) ) 
           {
             e->reset();
@@ -92,7 +93,7 @@ int main() {
          e->calculate_probabilities(e->z);
 
          rnd = (float)rand()/RAND_MAX;
-         if (rnd < e->p_emit) {
+         if (rnd/3.0 < e->p_emit) {
             e->interaction_count++;
             rnd = (float)rand()/RAND_MAX;
             if (rnd < e->p_emit_r) {
@@ -176,16 +177,16 @@ int main() {
 
 //         cout << B[0] << " " << B[1] << "  " << B[2]  << endl;
 
-         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 10000000. ;
-         e->Fy += (e->vz * B[0] - e->vx * B[2]) /10000000. ;
-         e->Fz += (e->vx * B[1] - e->vy * B[0]) /10000000.;
-
+         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e2 ;
+         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e2;
+         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e2 ;
+ 
 //         cout << "F_Bx = " << (e->vy * B[2] - e->vz * B[1]) / 1000. << endl;
          
 
-         e->Fx += 10*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
-         e->Fy += 10*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
-         e->Fz += 10*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
+         e->Fx += 1e-2*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
+         e->Fy += 1e-2*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
+         e->Fz += 1e-2*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
 
 /*         if ( e->ID == 4 ) {
             cout << "x=" << e->x << "    ey="<<e->y<<"      ez="<<e->z << endl;
@@ -212,8 +213,7 @@ int main() {
          
 //if (e->ID==3) cout << endl << e->z << "   "  << e->p_emit_r << "  " << e->p_emit_g << "  " << e->p_emit_b << "  "<< e->p_emit ;
         
-         if (e->ID==3) cout << e->x << "\t" << e->y << "\t" << e->z << "\tE: " << e->E << "\n" ;
-         if (e->ID==3) cout << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
+         if (e->ID==3) cout << t << "\t" << e->x << "\t" << e->y << "\t" << e->z << "\tE: " << e->E <<  "\t"  << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
 
 //         cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ; 
 //         cout << e->vx << "\t" << e->vy << "\t" << e->vz << "\n" ; 
@@ -221,8 +221,6 @@ int main() {
          
       }
 
-      cout << "\rComputing electric field                  "  ;
-      cout.flush();
       E_field.compute();
       rho.reset();
 
