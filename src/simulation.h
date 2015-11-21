@@ -24,8 +24,10 @@ class Simulation {
       float box_sizex = 100.0; //.push_back(100.00);
       float box_sizey = 100.0; //.push_back(100.00);
       float box_sizez = 200.0; //push_back(200.00);
-      
-      float dt=0.001;
+
+      vector<float> sheet_seeds;
+
+      float dt=0.0001;
    
       /* Mean energy of electrons when they begin, in keV */
       float E_mean = 10.0;
@@ -48,9 +50,19 @@ class Simulation {
       const float m_e = 1.0;
       float hc = 1.23984197 *10000; //*plank's constant in keV*nm 
 
+
+      void seed() {
+         for (int i=0; i<10000; i++) {
+            sheet_seeds.push_back((float)rand()/RAND_MAX) ; // = gen_random(100);
+         }
+
+      }
+
       float number_density(float h) {
          return 7.86778379e6*exp(-h*0.176299767);
       }
+
+
       float bethe_energy_loss(float h,float v) {
          // dE/dx due to atmospheric 'drag'
          float effective_Z = 7.2; // 
@@ -58,18 +70,6 @@ class Simulation {
          float coeff = 4*M_PI*number_density(h)*pow(e_chg,4)*effective_Z / (m_e * pow(v,2));
          float parenthesis= log(  2*pow(v,2) / (m_e*Ionization  )) - 1.2329;
          return coeff*parenthesis;
-      }
-
-      bool in_sheet1(float x, float y) {
-         int N = 4;
-         float shift = 0.1*(float)rand()/RAND_MAX + 0.95;
-         if (x < box_sizex*sin(shift * N * M_PI * (y - box_sizey/2) / box_sizey) 
-             && x > box_sizex*sin(shift * N * M_PI * (y - box_sizey/2) / box_sizey) ) {
-          return 1  ;
-         } else {
-            return 0;
-         }
-
       }
 
  };

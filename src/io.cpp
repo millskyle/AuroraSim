@@ -16,11 +16,11 @@ class PhotonDensity {
 
 
    public:
-      int resolution_x = 100; //divisions along the box dimension
-      int resolution_y = 400;
-      int resolution_z = 800;
+      int resolution_x = 250; //divisions along the box dimension
+      int resolution_y = 250;
+      int resolution_z = 500;
 
-      float optical_decay_power = 2.0; //light intensity drops off as distance to this power (vacuum would be 2.0) 
+      float optical_decay_power = 0.0; //light intensity drops off as distance to this power (vacuum would be 2.0) 
 
       float *R  = new float[resolution_x*resolution_y*resolution_z];
       float *G  = new float[resolution_x*resolution_y*resolution_z];
@@ -38,8 +38,26 @@ class PhotonDensity {
       }
 
    
-      int incr_element(float *A ,int i, int j, int k,float n) {
+      int incr_element(float *A ,int i, int j, int k,float n) {      
          A[i + resolution_x *( j + resolution_y * k) ] += n;
+         /*if (i>1 && i<resolution_x-2) {
+            A[(i+1) + resolution_x *( j + resolution_y * k) ] += n/4.0;
+            A[(i-1) + resolution_x *( j + resolution_y * k) ] += n/4.0;
+         }
+         if (j>1 && j < resolution_y-2) {
+            A[i + resolution_x *( (j+1) + resolution_y * k) ] += n/4.0;
+            A[i + resolution_x *( (j-1) + resolution_y * k) ] += n/4.0;
+         }
+         if (k>1 && k < resolution_z-2) {
+            A[i + resolution_x *( j + resolution_y * (k-1)) ] += n/4.0;
+            A[i + resolution_x *( j + resolution_y * (k+1)) ] += n/4.0;
+         }
+
+      */
+
+
+
+
          return 0;
       }
 
@@ -82,9 +100,9 @@ class PhotonDensity {
         cout << "\rBrightest voxel had un-normed brightness of " << gmax << "                             ";
         cout.flush();
 
-        *R = scalar_divide(R,gmax); 
-        *G = scalar_divide(G,gmax); 
-        *B = scalar_divide(B,gmax); 
+//        *R = scalar_divide(R,gmax); 
+//        *G = scalar_divide(G,gmax); 
+//        *B = scalar_divide(B,gmax); 
 
             
 
@@ -177,6 +195,11 @@ class OutputReport {
     vector<float> EvsT;
     int interactions;
     int respawns;
+
+    ofstream initial_positions_file;
+    int init() {
+       initial_positions_file.open("output/initial_positions.txt");
+    }
 
 
     int write(string filename) {

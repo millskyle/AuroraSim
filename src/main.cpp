@@ -22,8 +22,10 @@ int main() {
    srand ( time(NULL));
    vector<float> randoms;
    Simulation sim;
+   sim.seed(); //generate random numbers that will be the same throughout program execution
    PhotonDensity photon_density;
    OutputReport report;
+   report.init();
    MagneticField mag_field;
    ChargeDensity rho;
    ElectricField E_field;
@@ -82,6 +84,10 @@ int main() {
             e->t = t;
          }
         
+        if (t==300) {
+           report.initial_positions_file << e->x << " " << e->y <<  endl;
+        }
+
         voxelx = int((float)photon_density.resolution_x / (float)sim.box_sizex * e->x);
         voxely = int((float)photon_density.resolution_y / (float)sim.box_sizey * e->y);
         voxelz = int((float)photon_density.resolution_z / (float)sim.box_sizez * e->z);
@@ -115,7 +121,7 @@ int main() {
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
             e->E -= sim.hc / e->emitting_wavelength;
-            e->random_collision();
+//            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==0) {
                report.EvsT.push_back(e->E);
@@ -189,12 +195,17 @@ int main() {
 //         cout << "F_Bx = " << (e->vy * B[2] - e->vz * B[1]) / 1000. << endl;
          
          e->Fx = 0;
-         e-> Fy = 0;
+         e->Fy = 0;
          e->Fz = 0;
 
-         e->Fx += 1e3*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
-         e->Fy += 1e3*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
-         e->Fz += 1e3*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
+         e->Fx += 1e2*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
+         e->Fy += 1e2*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
+         e->Fz += 1e2*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
+
+//         e->Fx = 0;
+//         e-> Fy = 0;
+//         e->Fz = 0;
+
 
 /*         if ( e->ID == 4 ) {
             cout << "x=" << e->x << "    ey="<<e->y<<"      ez="<<e->z << endl;
@@ -220,7 +231,9 @@ int main() {
          
 //if (e->ID==3) cout << endl << e->z << "   "  << e->p_emit_r << "  " << e->p_emit_g << "  " << e->p_emit_b << "  "<< e->p_emit ;
         
-         if (e->ID==3) cout << t << "\t" << e->x << "\t" << e->y << "\t" << e->z << "\tE: " << e->E <<  "\t"  << e->Fx << "\t" << e->Fy << "\t" << e->Fz << "\n" ;
+         if (e->ID==3) cout << t << "\t" << e->x << "\t" << e->y << "\t" << e->z 
+                            << "\tE: " << e->E <<  "\t"  << e->Fx << "\t" << e->Fy << "\t" << e->Fz 
+                            << "\t" << e->vx << "\t" << e->vy << "\t" << e->vz <<  "\n" ;
 
 //         cout << e->x << "\t" << e->y << "\t" << e->z << "\n" ; 
 //         cout << e->vx << "\t" << e->vy << "\t" << e->vz << "\n" ; 
