@@ -220,11 +220,15 @@ public:
          cout << "  at respawn:  x=" <<  x << "    y=" <<  y << "    z="<< z << endl;
       }
       t = 0;
-      x = sim->box_sizex *(float)rand() / RAND_MAX;
-      y = sim->box_sizey* (float)rand() / RAND_MAX;
+//      x = sim->box_sizex *(float)rand() / RAND_MAX;
+//      y = sim->box_sizey* (float)rand() / RAND_MAX;
 
+      if ((float)rand()/RAND_MAX > 0.9) {
+         y = 75.0;
+      } else {
+         y = 30.0;
+      }
       x = 50.0;
-      y = 50.0;
 
 
       z = 0.1 * sim->box_sizez* (float)rand() / RAND_MAX + 0.9*sim->box_sizez;
@@ -425,9 +429,9 @@ class MagneticField {
 
 class ChargeDensity {
    public:
-      int resolution_x = 40;
-      int resolution_y = 40;
-      int resolution_z = 80;
+      int resolution_x = 20;
+      int resolution_y = 20;
+      int resolution_z = 60;
 
       float *p = new float[resolution_x*resolution_y*resolution_z];
     
@@ -454,6 +458,7 @@ class ChargeDensity {
 class ElectricField {
 
    public:
+      bool planned;
       int Nx;
       int Ny;
       int Nz;
@@ -476,6 +481,9 @@ class ElectricField {
          Lx = sim->box_sizex ; 
          Ly = sim->box_sizey ;
          Lz = sim->box_sizez ;
+
+         planned = 0;
+
       }
 
 
@@ -497,6 +505,10 @@ class ElectricField {
          float dy = Ly/float(Ny-1) ;
          float dz = Lz/float(Nz-1) ;
 
+         float invNx = 1.0/(Nx*Nx*Nx);
+         float invNy = 1.0/(Ny*Ny*Ny);
+         float invNz = 1.0/(Nz*Nz*Nz);
+
          fftw_complex *in = new fftw_complex[Nx*Ny*Nz];
          fftw_complex *out = new fftw_complex[Nx*Ny*Nz];
          fftw_complex *in2 = new fftw_complex[Nx*Ny*Nz];
@@ -508,8 +520,14 @@ class ElectricField {
          fftw_plan forward;
          fftw_plan inverse;
 
-         forward = fftw_plan_dft_3d(Nx,Ny,Nz,in, out, FFTW_FORWARD, FFTW_MEASURE );
-         inverse = fftw_plan_dft_3d(Nx,Ny,Nz,in2, out2, FFTW_BACKWARD, FFTW_MEASURE );
+         float wavenumber_x = 0;
+         float wavenumber_y = 0;
+         float wavenumber_z = 0;
+
+         if (!planned) {
+            forward = fftw_plan_dft_3d(Nx,Ny,Nz,in, out, FFTW_FORWARD, FFTW_MEASURE );
+            inverse = fftw_plan_dft_3d(Nx,Ny,Nz,in2, out2, FFTW_BACKWARD, FFTW_MEASURE );
+         }
          
          for (int i=0; i<Nx; i++) {
             for (int j=0; j<Ny; j++) {
@@ -534,33 +552,55 @@ class ElectricField {
          }
 */
 
-
+         int element = -1;
          for (int i=0; i<Nx; i++) {
-            for (int j=0; j<Ny; j++) {
+                   if (2*i < Nx) {
+                     wavenumber_x = (  (double)i*i) * invNx;
+                  } else { 
+                     wavenumber_x = (  (double)(Nx - i)*(Nx - i) ) * invNx;
+                  }
+
+           for (int j=0; j<Ny; j++) {
+                   if (2*j < Ny) {
+                     wavenumber_y = (  (double)j*j) * invNy;
+                  } else { 
+                     wavenumber_y = (  (double)(Ny - j)*(Ny - j) ) * invNy;
+                  }
                for (int k=0; k<Nz; k++) {
+                  element++;
+                 
+                  if (2*k < Nz) {
+                     wavenumber_z = (  (double)k*k) * invNz;
+                  } else { 
+                     wavenumber_z = (  (double)(Nz - k)*(Nz - k) ) * invNz;
+                  }
+
+
                   //flip the real and imaginary parts
-                  in2[i + Nx *( j + Ny * k)][1] = -sqrt(i*i + j*j + k*k)*out[i + Nx *( j + Ny * k)][0] / ((double)i*i+j*j+k*k+1e-16);
-                  in2[i + Nx *( j + Ny * k)][0] = -sqrt(i*i + j*j + k*k) * out[i + Nx *( j + Ny * k)][1] / (i*i+j*j+k*k+1e-16);
+//                  in2[i + Nx *( j + Ny * k)][0] = -sqrt(i*i + j*j + k*k)*out[i + Nx *( j + Ny * k)][0] / ((double)i*i+j*j+k*k+1e-16);
+//                  in2[i + Nx *( j + Ny * k)][1] = -sqrt(i*i + j*j + k*k) * out[i + Nx *( j + Ny * k)][1] / (i*i+j*j+k*k+1e-16);
+                  //(  (double)i*i*dx*dx + (double)j*j*dy*dy + (double)k*k*dz*dz + 1e-20) / (2*M_PI*2*M_PI) ;
+//                  cout << denom << "\t" ;
+                  in2[element][0] = - out[element][0] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20);
+                  in2[element][1] = - out[element][1] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20) ;
                }
             }
          }
 
          fftw_execute(inverse);
 
+         fftw_destroy_plan(inverse);
+         fftw_destroy_plan(forward);
 
-
-
-
-
-
-
-
+         element=-1;
          for (int i=0; i<Nx; i++) {
             for (int j=0; j<Ny; j++) {
                for (int k=0; k< Nz; k++) {
+                  element++;
                   // poisson's equation: del^2 phi = - rho / epsilon_naught
-                  phi[i + Nx *( j + Ny * k) ]  =  (float)out2[i + Nx *( j + Ny * k) ][0];
-  //                if (phi[i + Nx *( j + Ny * k) ]==0) {
+                  phi[element]  =  (float)out2[element][0];
+                  
+  //                if (phi[element]==0) {
 //                  }else{
 //                     cout << phi[i + Nx *( j + Ny * k) ] << "  " ;
 //                  }
@@ -596,6 +636,11 @@ class ElectricField {
                   tmp0 = get_element(phi, i, j, k-1);
                   tmp1 = get_element(phi, i, j, k+1); 
                   update_element(Ez, i, j, k,  (tmp0-tmp1)/(2*dz)      );
+//                  if (i*i + j*j + k*k < 3000) {
+//                     update_element(Ez, i, j, k,  10000.0    );
+//                     update_element(Ey, i, j, k,  10000.0    );
+//                     update_element(Ex, i, j, k,  1000.0    );
+//                  }
                }
             }
          }

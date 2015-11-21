@@ -84,12 +84,7 @@ int main() {
         voxely = int((float)photon_density.resolution_y / (float)sim.box_sizey * e->y);
         voxelz = int((float)photon_density.resolution_z / (float)sim.box_sizez * e->z);
 
-        if ( e->z < sim.box_sizez 
-          && e->x >= 0 
-          && e->x <= sim.box_sizex
-          && e->y >= 0
-          && e->y <= sim.box_sizey    ) {
-         
+        
          e->calculate_probabilities(e->z);
 
          rnd = (float)rand()/RAND_MAX;
@@ -125,6 +120,12 @@ int main() {
             }
             e->emitting_time_left -= 1;
             
+        if ( e->z < sim.box_sizez 
+          && e->x >= 0 
+          && e->x <= sim.box_sizex
+          && e->y >= 0
+          && e->y <= sim.box_sizey    ) {
+ 
 
             if (e->emitting_wavelength == sim.wavelength_red ) {
                 photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*1.0) ;
@@ -137,6 +138,8 @@ int main() {
                 photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
             }
 
+        }
+
             
             if (e->emitting_time_left < 1) { //if it's done emitting
                e->emitting = 0;
@@ -144,7 +147,7 @@ int main() {
             }
          }
 
-        }
+        
 
 
         e->rescale_velocities();
@@ -183,10 +186,13 @@ int main() {
  
 //         cout << "F_Bx = " << (e->vy * B[2] - e->vz * B[1]) / 1000. << endl;
          
+         e->Fx = 0;
+         e-> Fy = 0;
+         e->Fz = 0;
 
-         e->Fx += 1e-2*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
-         e->Fy += 1e-2*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
-         e->Fz += 1e-2*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
+         e->Fx += 1e1*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
+         e->Fy += 1e1*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
+         e->Fz += 1e1*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
 
 /*         if ( e->ID == 4 ) {
             cout << "x=" << e->x << "    ey="<<e->y<<"      ez="<<e->z << endl;
@@ -197,7 +203,6 @@ int main() {
          //cout << "F_Ex=" << (sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz)) << endl;
          
          //Perform equation of motion integration:
-
 
          
 
