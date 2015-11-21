@@ -180,9 +180,9 @@ int main() {
 
 //         cout << B[0] << " " << B[1] << "  " << B[2]  << endl;
 
-         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e2 ;
-         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e2;
-         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e2 ;
+         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e6 ;
+         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e6;
+         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e6 ;
  
 //         cout << "F_Bx = " << (e->vy * B[2] - e->vz * B[1]) / 1000. << endl;
          
@@ -190,9 +190,9 @@ int main() {
          e-> Fy = 0;
          e->Fz = 0;
 
-         e->Fx += 1e1*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
-         e->Fy += 1e1*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
-         e->Fz += 1e1*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
+         e->Fx += 1e3*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
+         e->Fy += 1e3*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
+         e->Fz += 1e3*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
 
 /*         if ( e->ID == 4 ) {
             cout << "x=" << e->x << "    ey="<<e->y<<"      ez="<<e->z << endl;

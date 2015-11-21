@@ -41,7 +41,8 @@ class Simulation {
       float wavelength_red = 500.0;
       float wavelength_green = 600.0;
       float wavelength_blue = 800.0;
-      float e_chg = 1.0; // elementary charge
+      float e_chg = 1e3; // elementary charge
+      float epsilon_naught = 1e-9;
       
       vector<Electron> electrons;
 
@@ -58,6 +59,18 @@ class Simulation {
          float coeff = 4*M_PI*number_density(h)*pow(e_chg,4)*effective_Z / (m_e * pow(v,2));
          float parenthesis= log(  2*pow(v,2) / (m_e*Ionization  )) - 1.2329;
          return coeff*parenthesis;
+      }
+
+      bool in_sheet1(float x, float y) {
+         int N = 4;
+         float shift = 0.1*(float)rand()/RAND_MAX + 0.95;
+         if (x < box_sizex*sin(shift * N * M_PI * (y - box_sizey/2) / box_sizey) 
+             && x > box_sizex*sin(shift * N * M_PI * (y - box_sizey/2) / box_sizey) ) {
+          return 1  ;
+         } else {
+            return 0;
+         }
+
       }
 
  };
@@ -112,6 +125,7 @@ public:
    float t;
    float ID;
    float tmp;
+   vector<float>  rands;
    
 
    float p_emit=0;
@@ -220,21 +234,33 @@ public:
          cout << "  at respawn:  x=" <<  x << "    y=" <<  y << "    z="<< z << endl;
       }
       t = 0;
-//      x = sim->box_sizex *(float)rand() / RAND_MAX;
-//      y = sim->box_sizey* (float)rand() / RAND_MAX;
+      x = sim->box_sizex *(float)rand() / RAND_MAX;
+      y = sim->box_sizey* (float)rand() / RAND_MAX;
 
-      if ((float)rand()/RAND_MAX > 0.9) {
+       
+     
+      randoms = gen_random(6);
+      
+      x = (randoms[3])*75.0 + sim->box_sizex/2.0;
+      y = abs(randoms[4])*75.0;
+
+/*      if ((float)rand()/RAND_MAX > 0.9) {
          y = 75.0;
       } else {
          y = 30.0;
       }
       x = 50.0;
 
+      */
+      
 
-      z = 0.1 * sim->box_sizez* (float)rand() / RAND_MAX + 0.9*sim->box_sizez;
-      //z = 1.1*sim->box_sizez -0.0001;
-      randoms = gen_random(3);
-      E = 1000*sim->E_mean * (abs(randoms[0])+1.0);
+      //
+      //z = 0.1 * sim->box_sizez* (float)rand() / RAND_MAX + 0.9*sim->box_sizez;
+      z = 1.1*sim->box_sizez -0.0001;
+
+  //    z = 180.0 ; //sim->box_sizez*(float)rand()/RAND_MAX ;  
+
+      E = 100000*sim->E_mean * (abs(randoms[0])+1.0);
       vx = (0.0001 * sqrt(2*E/sim->m_e) * randoms[1]);
       vy = (0.0001 * sqrt(2*E/sim->m_e) * randoms[2]);
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
@@ -257,9 +283,9 @@ class PhotonDensity {
 
 
    public:
-      int resolution_x = 250; //divisions along the box dimension
-      int resolution_y = 250;
-      int resolution_z = 500;
+      int resolution_x = 100; //divisions along the box dimension
+      int resolution_y = 400;
+      int resolution_z = 800;
 
       float optical_decay_power = 2.0; //light intensity drops off as distance to this power (vacuum would be 2.0) 
 
@@ -482,6 +508,9 @@ class ElectricField {
          Ly = sim->box_sizey ;
          Lz = sim->box_sizez ;
 
+         float *Ex = new float[Nx*Ny*Nz];
+         float *Ey = new float[Nx*Ny*Nz];
+         float *Ez = new float[Nx*Ny*Nz];
          planned = 0;
 
       }
@@ -514,11 +543,26 @@ class ElectricField {
          fftw_complex *in2 = new fftw_complex[Nx*Ny*Nz];
          fftw_complex *out2 = new fftw_complex[Nx*Ny*Nz];
 
+         fftw_complex *inPhiX = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *outEX = new fftw_complex[Nx*Ny*Nz];
+
+         fftw_complex *inPhiY = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *outEY = new fftw_complex[Nx*Ny*Nz];
+
+         fftw_complex *inPhiZ = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *outEZ = new fftw_complex[Nx*Ny*Nz];
+
+
          float *phi = new float[Nx*Ny*Nz];
          double elem[2] = {0};
 
          fftw_plan forward;
          fftw_plan inverse;
+         fftw_plan inverseX;
+         fftw_plan inverseY;
+         fftw_plan inverseZ;
+
+         int element = -1;
 
          float wavenumber_x = 0;
          float wavenumber_y = 0;
@@ -527,17 +571,24 @@ class ElectricField {
          if (!planned) {
             forward = fftw_plan_dft_3d(Nx,Ny,Nz,in, out, FFTW_FORWARD, FFTW_MEASURE );
             inverse = fftw_plan_dft_3d(Nx,Ny,Nz,in2, out2, FFTW_BACKWARD, FFTW_MEASURE );
+
+            inverseX = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiX, outEX, FFTW_BACKWARD, FFTW_MEASURE );
+            inverseY = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiY, outEY, FFTW_BACKWARD, FFTW_MEASURE );
+            inverseZ = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiZ, outEZ, FFTW_BACKWARD, FFTW_MEASURE );
          }
-         
+        
+
+         element = -1 ;
          for (int i=0; i<Nx; i++) {
             for (int j=0; j<Ny; j++) {
                for (int k=0; k< Nz; k++) {
+                  element++;
                   // poisson's equation: del^2 phi = - rho / epsilon_naught
                   elem[1]=0;
-                  elem[0] = - (double)(rho->p[i + int(Nx) *( j + int(Ny) * k) ]);
+                  elem[0] = - (double)(rho->p[element]);
 //                  if (elem[0]!=0){ cout << elem[0] << " ";}
-                  in[i + Nx *( j + Ny * k) ][0] = elem[0];
-                  in[i + Nx *( j + Ny * k)][1] = elem[1];
+                  in[element][0] = elem[0];
+                  in[element][1] = elem[1];
                }
             }
          }
@@ -551,8 +602,10 @@ class ElectricField {
             }
          }
 */
+         double tmpReal;
+         double tmpImag;
 
-         int element = -1;
+         element = -1;
          for (int i=0; i<Nx; i++) {
                    if (2*i < Nx) {
                      wavenumber_x = (  (double)i*i) * invNx;
@@ -581,16 +634,34 @@ class ElectricField {
 //                  in2[i + Nx *( j + Ny * k)][1] = -sqrt(i*i + j*j + k*k) * out[i + Nx *( j + Ny * k)][1] / (i*i+j*j+k*k+1e-16);
                   //(  (double)i*i*dx*dx + (double)j*j*dy*dy + (double)k*k*dz*dz + 1e-20) / (2*M_PI*2*M_PI) ;
 //                  cout << denom << "\t" ;
-                  in2[element][0] = - out[element][0] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20);
-                  in2[element][1] = - out[element][1] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20) ;
+                  
+                 
+          tmpReal = -out[element][0] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20);
+          tmpImag = -out[element][1] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20);
+
+          tmpReal /= sim->epsilon_naught;
+          tmpImag /= sim->epsilon_naught;
+
+          inPhiX[element][1] = -tmpReal * wavenumber_x ;
+          inPhiX[element][0] =  tmpImag * wavenumber_x ;
+          
+          inPhiY[element][1] = -tmpReal * wavenumber_y ;
+          inPhiY[element][0] =  tmpImag * wavenumber_y ;
+          
+          inPhiZ[element][1] = -tmpReal * wavenumber_z ;
+          inPhiZ[element][0] =  tmpImag * wavenumber_z ;
+
+          // in2[element][0] = - out[element][0] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20);
+          // in2[element][1] = - out[element][1] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20) ;
                }
             }
          }
 
-         fftw_execute(inverse);
-
-         fftw_destroy_plan(inverse);
-         fftw_destroy_plan(forward);
+         //fftw_execute(inverse);
+         
+         fftw_execute(inverseX);
+         fftw_execute(inverseY);
+         fftw_execute(inverseZ);
 
          element=-1;
          for (int i=0; i<Nx; i++) {
@@ -598,9 +669,15 @@ class ElectricField {
                for (int k=0; k< Nz; k++) {
                   element++;
                   // poisson's equation: del^2 phi = - rho / epsilon_naught
-                  phi[element]  =  (float)out2[element][0];
-                  
-  //                if (phi[element]==0) {
+//                  cout << i << "|" << j << "|" << k << endl;
+//                  cout <<"!"<< (float)outEX[element][0] << "!" <<endl;
+                  update_element(Ex, i, j, k, (float)outEX[element][0]) ;
+                  update_element(Ey, i, j, k, (float)outEY[element][0]) ;
+                  update_element(Ez, i, j, k, (float)outEZ[element][0]) ;
+                  //Ex[element] = (float)outEX[element][0] ;
+
+
+//                  if (phi[element]==0) {
 //                  }else{
 //                     cout << phi[i + Nx *( j + Ny * k) ] << "  " ;
 //                  }
@@ -608,8 +685,8 @@ class ElectricField {
             }
          }
 
-
-
+////////////////////////////////////////
+/*  NO LONGER NEEDED IF I'M USING SPECTRAL METHODS TO FIND E DIRECTLY.
 
 
 
@@ -645,8 +722,8 @@ class ElectricField {
             }
          }
 
-
-
+*/
+////////////////////////////////////////
 
 
 }
