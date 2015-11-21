@@ -11,6 +11,8 @@
 
 #include "utility_functions.h"
 #include "data_structure.h"
+#include "electrostatics.cpp"
+#include "io.cpp"
 
 using namespace std;
 
