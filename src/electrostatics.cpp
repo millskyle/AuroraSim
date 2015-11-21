@@ -12,7 +12,7 @@ using namespace std;
 
 class MagneticField {
    public:
-      float strength = 1000.0;
+      float strength = 1.0;
 
       vector<float> at(float t,float x,float y,float z){
          vector<float> r;
@@ -28,9 +28,9 @@ class MagneticField {
 
 class ChargeDensity {
    public:
-      int resolution_x = 40;
-      int resolution_y = 40;
-      int resolution_z = 80;
+      int resolution_x = 20;
+      int resolution_y = 20;
+      int resolution_z = 40;
 
       float *p = new float[resolution_x*resolution_y*resolution_z];
     
@@ -49,6 +49,7 @@ class ChargeDensity {
          }
       }
  
+
 
 
 };
@@ -70,6 +71,20 @@ class ElectricField {
       float *Ex ;//= new float[Nx*Ny*Nz];
       float *Ey ;//= new float[Nx*Ny*Nz];
       float *Ez ;//= new float[Nx*Ny*Nz];
+         fftw_complex *in ;// = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *out  ;// = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *in2  ;// = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *out2  ;// = new fftw_complex[Nx*Ny*Nz];
+
+         fftw_complex *inPhiX  ;// = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *outEX  ;// = new fftw_complex[Nx*Ny*Nz];
+
+         fftw_complex *inPhiY  ;// = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *outEY  ;// = new fftw_complex[Nx*Ny*Nz];
+
+         fftw_complex *inPhiZ  ;// = new fftw_complex[Nx*Ny*Nz];
+         fftw_complex *outEZ  ;// = new fftw_complex[Nx*Ny*Nz];
+
 
       int init(Simulation *simm, ChargeDensity *rhoo) {
          sim = simm;
@@ -85,6 +100,20 @@ class ElectricField {
           Ey = new float[Nx*Ny*Nz];
           Ez = new float[Nx*Ny*Nz];
          planned = 0;
+         in = new fftw_complex[Nx*Ny*Nz];
+         out = new fftw_complex[Nx*Ny*Nz];
+         in2 = new fftw_complex[Nx*Ny*Nz];
+         out2 = new fftw_complex[Nx*Ny*Nz];
+                          
+         inPhiX = new fftw_complex[Nx*Ny*Nz];
+         outEX = new fftw_complex[Nx*Ny*Nz];
+
+         inPhiY = new fftw_complex[Nx*Ny*Nz];
+         outEY = new fftw_complex[Nx*Ny*Nz];
+
+         inPhiZ = new fftw_complex[Nx*Ny*Nz];
+         outEZ = new fftw_complex[Nx*Ny*Nz];
+
 
       }
 
@@ -111,20 +140,6 @@ class ElectricField {
          float invNy = 1.0/(Ny*Ny*Ny);
          float invNz = 1.0/(Nz*Nz*Nz);
 
-         fftw_complex *in = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *out = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *in2 = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *out2 = new fftw_complex[Nx*Ny*Nz];
-
-         fftw_complex *inPhiX = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *outEX = new fftw_complex[Nx*Ny*Nz];
-
-         fftw_complex *inPhiY = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *outEY = new fftw_complex[Nx*Ny*Nz];
-
-         fftw_complex *inPhiZ = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *outEZ = new fftw_complex[Nx*Ny*Nz];
-
 
          float *phi = new float[Nx*Ny*Nz];
          double elem[2] = {0};
@@ -143,7 +158,7 @@ class ElectricField {
 
          if (!planned) {
             forward = fftw_plan_dft_3d(Nx,Ny,Nz,in, out, FFTW_FORWARD, FFTW_MEASURE );
-            inverse = fftw_plan_dft_3d(Nx,Ny,Nz,in2, out2, FFTW_BACKWARD, FFTW_MEASURE );
+//            inverse = fftw_plan_dft_3d(Nx,Ny,Nz,in2, out2, FFTW_BACKWARD, FFTW_MEASURE );
 
             inverseX = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiX, outEX, FFTW_BACKWARD, FFTW_MEASURE );
             inverseY = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiY, outEY, FFTW_BACKWARD, FFTW_MEASURE );
@@ -158,7 +173,7 @@ class ElectricField {
                   element++;
                   // poisson's equation: del^2 phi = - rho / epsilon_naught
                   elem[1]=0;
-                  elem[0] = - (double)(rho->p[element]);
+                  elem[0] = - (double)(rho->p[element] / (sim->N*dx*dy*dz   ));
 //                  if (elem[0]!=0){ cout << elem[0] << " ";}
                   in[element][0] = elem[0];
                   in[element][1] = elem[1];
@@ -215,14 +230,14 @@ class ElectricField {
           tmpReal /= -sim->epsilon_naught;
           tmpImag /= -sim->epsilon_naught;
 
-          inPhiX[element][1] =  tmpReal * wavenumber_x ;
-          inPhiX[element][0] =  -tmpImag * wavenumber_x ;
+          inPhiX[element][1] =  -tmpReal * wavenumber_x ;
+          inPhiX[element][0] =  tmpImag * wavenumber_x ;
           
-          inPhiY[element][1] = tmpReal * wavenumber_y ;
-          inPhiY[element][0] =  -tmpImag * wavenumber_y ;
+          inPhiY[element][1] = -tmpReal * wavenumber_y ;
+          inPhiY[element][0] =  tmpImag * wavenumber_y ;
           
-          inPhiZ[element][1] = tmpReal * wavenumber_z ;
-          inPhiZ[element][0] = - tmpImag * wavenumber_z ;
+          inPhiZ[element][1] = -tmpReal * wavenumber_z ;
+          inPhiZ[element][0] = tmpImag * wavenumber_z ;
 
           // in2[element][0] = - out[element][0] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20);
           // in2[element][1] = - out[element][1] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20) ;
@@ -299,7 +314,7 @@ class ElectricField {
 ////////////////////////////////////////
 
 fftw_destroy_plan(forward);
-fftw_destroy_plan(inverse);
+//fftw_destroy_plan(inverse);
 fftw_destroy_plan(inverseX);
 fftw_destroy_plan(inverseY);
 fftw_destroy_plan(inverseZ);

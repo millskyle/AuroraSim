@@ -16,11 +16,11 @@ class PhotonDensity {
 
 
    public:
-      int resolution_x = 250; //divisions along the box dimension
-      int resolution_y = 250;
-      int resolution_z = 500;
+      int resolution_x = 200; //divisions along the box dimension
+      int resolution_y = 200;
+      int resolution_z = 200;
 
-      float optical_decay_power = 0.0; //light intensity drops off as distance to this power (vacuum would be 2.0) 
+      float optical_decay_power = 1.1; //light intensity drops off as distance to this power (vacuum would be 2.0) 
 
       float *R  = new float[resolution_x*resolution_y*resolution_z];
       float *G  = new float[resolution_x*resolution_y*resolution_z];
@@ -129,6 +129,7 @@ class PhotonDensity {
         float pixelsumR =0;
         float pixelsumG =0;
         float pixelsumB =0;
+        int element = -1 ;
 
         float maxpixelsumR =1;
         float maxpixelsumG =1;
@@ -167,8 +168,23 @@ class PhotonDensity {
 
            }
         }
+        element = -1;
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
+              element++;
+/*              if ( Rflat[element] > Gflat[element] ) {
+                 Gflat[element] = 0;
+              } else {
+                 Rflat[element] =0; 
+              }
+              if (Rflat[element] > Bflat[element]) {
+                 Bflat[element] = 0;
+              } else {
+                 Rflat[element] = 0;
+              }
+
+              */
+
               img << Rflat[k*resolution_y + j]/maxpixelsumR << " "
                   << Gflat[k*resolution_y + j]/maxpixelsumG << " " 
                   << Bflat[k*resolution_y + j]/maxpixelsumB << "\n";

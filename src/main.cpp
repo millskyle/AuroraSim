@@ -56,7 +56,7 @@ int main() {
    cout << endl;
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
-      if (t%10000==0) {
+      if (t%100==0 && t>500) {
          photon_density.write_image(t);
          photon_density.reset();
 
@@ -120,7 +120,7 @@ int main() {
 
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
-            e->E -= sim.hc / e->emitting_wavelength;
+            e->E -= 100*sim.hc / e->emitting_wavelength;
 //            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==0) {
@@ -188,9 +188,9 @@ int main() {
 
 //         cout << B[0] << " " << B[1] << "  " << B[2]  << endl;
 
-         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e6 ;
-         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e6;
-         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e6 ;
+         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e19 ;
+         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e19;
+         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e19 ;
  
 //         cout << "F_Bx = " << (e->vy * B[2] - e->vz * B[1]) / 1000. << endl;
          
@@ -198,13 +198,13 @@ int main() {
          e->Fy = 0;
          e->Fz = 0;
 
-         e->Fx += 1e2*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz))/1.;
-         e->Fy += 1e2*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz))/1.;
-         e->Fz += 1e2*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz))/1.;
+         e->Fx += 1e8*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
+         e->Fy += 1e8*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
+         e->Fz += 1e8*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
 
-//         e->Fx = 0;
-//         e-> Fy = 0;
-//         e->Fz = 0;
+ //        e->Fx = 0;
+ //        e-> Fy = 0;
+ //        e->Fz = 0;
 
 
 /*         if ( e->ID == 4 ) {
@@ -241,7 +241,7 @@ int main() {
          
       }
 
-      E_field.compute();
+      if (t%20==0) { E_field.compute(); }
       rho.reset();
 
    }

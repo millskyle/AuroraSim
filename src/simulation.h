@@ -17,8 +17,8 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 1000;
-      int tmax = 1000;
+      int N = 10000;
+      int tmax = 100000;
 
       /* box size, in km */
       float box_sizex = 100.0; //.push_back(100.00);
@@ -34,9 +34,9 @@ class Simulation {
       
       float E_low_threshold = 10; 
       
-      int timescale_red_emission = 50.; //110/dt;
+      int timescale_red_emission = 1100.; //110/dt;
       int timescale_green_emission = 50.;// 0.7/dt;
-      int timescale_blue_emission = 50.;// 0.001/dt;
+      int timescale_blue_emission = 2.;// 0.001/dt;
 
 
       float wavelength_red = 500.0;
