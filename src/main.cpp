@@ -7,12 +7,12 @@
 #include <time.h>
 #include <stdio.h>      /* printf, NULL */
 #include <stdlib.h>     /* srand, rand */
-#include <fftw3.h>
 
 #include "utility_functions.h"
-#include "data_structure.h"
+#include "simulation.h"
 #include "electrostatics.cpp"
 #include "io.cpp"
+#include "electron.h"
 
 using namespace std;
 
