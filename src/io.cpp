@@ -20,7 +20,7 @@ class PhotonDensity {
       int resolution_y = 600;
       int resolution_z = 600;
 
-      float optical_decay_power = 1.0; //light intensity drops off as distance to this power (vacuum would be 2.0) 
+      float optical_decay_power = 1.6; //light intensity drops off as distance to this power (vacuum would be 2.0) 
 
       float *R  = new float[resolution_x*resolution_y*resolution_z];
       float *G  = new float[resolution_x*resolution_y*resolution_z];
@@ -114,7 +114,7 @@ class PhotonDensity {
      int write_image(int t) {
         cout << "\rNormalizing for max brightness                                 " ;
         cout.flush();
-        normalize();
+//        normalize();
 
         ofstream img;
         img.open("output/" + to_string(t) + ".dat");
@@ -142,12 +142,12 @@ class PhotonDensity {
               pixelsumR=0;
               pixelsumG=0;
               pixelsumB=0;
-              for (int i=0; i<resolution_x; i++)  {
+              for (int i=0.3*resolution_x; i<resolution_x; i++)  {
                  opt_decay = pow( 
                      (  1 - (float(i))/float(resolution_x)  ) , optical_decay_power);
-                 pixelsumR += get_element(R, i, j, k) / (opt_decay);
-                 pixelsumG += get_element(G, i, j, k) / (opt_decay);
-                 pixelsumB += get_element(B, i, j, k) / (opt_decay);
+                 pixelsumR += get_element(R, i, j, k) / (opt_decay*0.7*resolution_x);
+                 pixelsumG += get_element(G, i, j, k) / (opt_decay*0.7*resolution_x);
+                 pixelsumB += get_element(B, i, j, k) / (opt_decay*0.7*resolution_x);
               }
               Rflat[k*resolution_y + j ] = pixelsumR;
               Gflat[k*resolution_y + j ] = pixelsumG;
@@ -158,8 +158,10 @@ class PhotonDensity {
            }
         }
 
-        gmax = maxpixelsumB + maxpixelsumG + maxpixelsumR;
+        gmax = (maxpixelsumB + maxpixelsumG + maxpixelsumR) ;
+        cout << "!!" << gmax << "!!" << endl;
         element = -1;
+        gmax = 150.0;
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
               element++;

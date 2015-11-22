@@ -57,7 +57,7 @@ int main() {
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
      sim.t = t;
-      if (t%1000==0 && t>1) {
+      if (t%10==0 && t>19) {
          photon_density.write_image(t);
          photon_density.reset();
 
@@ -138,23 +138,23 @@ int main() {
  
 
             if (e->emitting_wavelength == sim.wavelength_red ) {
-                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126) ;
-                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.2126) ;
-                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2126) ;
-//                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*1.0) ;
-//                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152*79.0/255.0) ;
+//                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126) ;
+//                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.2126) ;
+//                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2126) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.9*1.0) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.9*79.0/255.0) ;
             } else if (e->emitting_wavelength == sim.wavelength_green ) {
-                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.7152) ;
-                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
-                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.7152) ;
-//                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.6*189.0/255.0) ;
-//                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
+//                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.7152) ;
+//                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
+//                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.7152) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.9*189.0/255.0) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.9) ;
             } else if (e->emitting_wavelength == sim.wavelength_blue ) {
-                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.0722) ;
-                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.0722) ;
-                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
-//                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*70./255.) ;
-//                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
+//                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.0722) ;
+//                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.0722) ;
+//                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.9*70./255.) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.9) ;
             }
 
         }
@@ -201,15 +201,15 @@ int main() {
          B = mag_field.at(e->x,e->y,e->z,t);
 
 
-//         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e12 ;
-//         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e12;
-//         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e12 ;
+         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e7 ;
+         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e7;
+         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e7 ;
  
          
 
-         e->Fx += 1e9*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
-         e->Fy += 1e9*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
-         e->Fz += 1e9*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
+         e->Fx += 1e6*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
+         e->Fy += 1e6*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
+         e->Fz += 1e6*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
 
  //        e->Fx = 0;
  //        e-> Fy = 0;
@@ -250,7 +250,7 @@ int main() {
          
       }
 
-      if (t%3==0) { E_field.compute(); }
+      if (t%1==0) { E_field.compute(); }
       rho.reset();
 
    }

@@ -17,18 +17,18 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 1000;
+      int N = 100000;
       int tmax = 100000;
       int t = 0;
 
       /* box size, in km */
-      float box_sizex = 100.0; //.push_back(100.00);
-      float box_sizey = 100.0; //.push_back(100.00);
+      float box_sizex = 200.0; //.push_back(100.00);
+      float box_sizey = 200.0; //.push_back(100.00);
       float box_sizez = 200.0; //push_back(200.00);
 
       vector<float> sheet_seeds;
 
-      float dt=0.0001;
+      float dt=0.001;
    
       /* Mean energy of electrons when they begin, in keV */
       float E_mean = 10.0;

@@ -44,7 +44,9 @@ public:
 
     
    float get_p_emit_red(float x) {
-      return 
+
+     
+     return 
       1.97692801419e-17 * pow(x, 8 ) + 
      -1.24675920355e-14 * pow(x, 7 ) + 
      2.61694799395e-12 * pow(x, 6 ) + 
@@ -151,11 +153,12 @@ public:
       t = 0;
       
       
-      y = sim->box_sizey* (float)rand() / RAND_MAX;
+      y = 0.333 * sim->box_sizey* (float)rand() / RAND_MAX + 0.333*sim->box_sizey;
+      x = 0.333 * sim->box_sizex* (float)rand() / RAND_MAX + 0.333*sim->box_sizex;
 
 
 
-      if ((float)rand()/RAND_MAX > 0.4) {
+/*      if ((float)rand()/RAND_MAX > 0.4) {
          A = sim->box_sizex/2.0 - 1.0;
          shift = sim->box_sizex/2.0;
          n = 6.0;
@@ -166,16 +169,17 @@ public:
          n = 4.23455;
          hshift = -sim->t / 1000.00;
       }
-
-
-
       x = A * sin(n*M_PI*(y-hshift)/sim->box_sizex) + shift;
+*/
+
+
+
 
 //      x = 3.0;
 //      y = 50.0;
 
 
-      if (sim->t > 1000) {
+      if (sim->t > 10000) {
          z = sim->box_sizez + 10*(float)rand()/RAND_MAX;
       } else {
          z = (float)rand()/RAND_MAX* sim->box_sizez ;
@@ -189,8 +193,8 @@ public:
 //      }
       
       E = 100000*sim->E_mean * (abs(randoms[0])+1.0);
-      vx = (0.001 * sqrt(2*E/sim->m_e) * randoms[1]);
-      vy = -(0.001 * sqrt(2*E/sim->m_e) * randoms[2]);
+      vx = 0.00; //(0.001 * sqrt(2*E/sim->m_e) * randoms[1]);
+      vy = 0.00; //-(0.001 * sqrt(2*E/sim->m_e) * randoms[2]);
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
       vz = -(sqrt( 2*E / sim->m_e - tmp )) ;
       emitting = 0;
