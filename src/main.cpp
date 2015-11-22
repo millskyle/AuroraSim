@@ -57,7 +57,7 @@ int main() {
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
      sim.t = t;
-      if (t%500==0 && t>1) {
+      if (t%1000==0 && t>1) {
          photon_density.write_image(t);
          photon_density.reset();
 
@@ -121,7 +121,7 @@ int main() {
 
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
-            e->E -= 500*sim.hc / e->emitting_wavelength;
+            e->E -= 100*sim.hc / e->emitting_wavelength;
 //            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==0) {
@@ -138,14 +138,23 @@ int main() {
  
 
             if (e->emitting_wavelength == sim.wavelength_red ) {
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*1.0) ;
+                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126) ;
+                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.2126) ;
+                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2126) ;
+//                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*1.0) ;
 //                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152*79.0/255.0) ;
             } else if (e->emitting_wavelength == sim.wavelength_green ) {
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.6*189.0/255.0) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
+                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.7152) ;
+                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
+                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.7152) ;
+//                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.6*189.0/255.0) ;
+//                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
             } else if (e->emitting_wavelength == sim.wavelength_blue ) {
+                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.0722) ;
+                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.0722) ;
+                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
 //                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*70./255.) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
+//                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
             }
 
         }
@@ -182,27 +191,25 @@ int main() {
 
          //add any applicable forces to e->Fx, e->Fy, e->Fz :
 
+         e->Fx = 0;
+         e->Fy = 0;
+         e->Fz = 0;
          //rescale the velocities according to the new energy
 
          randoms = gen_random(3);
 
          B = mag_field.at(e->x,e->y,e->z,t);
 
-//         cout << B[0] << " " << B[1] << "  " << B[2]  << endl;
 
-         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e19 ;
-         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e19;
-         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e19 ;
+//         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e12 ;
+//         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e12;
+//         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e12 ;
  
-//         cout << "F_Bx = " << (e->vy * B[2] - e->vz * B[1]) / 1000. << endl;
          
-         e->Fx = 0;
-         e->Fy = 0;
-         e->Fz = 0;
 
-         e->Fx += 1e8*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
-         e->Fy += 1e8*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
-         e->Fz += 1e8*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
+         e->Fx += 1e9*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
+         e->Fy += 1e9*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
+         e->Fz += 1e9*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
 
  //        e->Fx = 0;
  //        e-> Fy = 0;

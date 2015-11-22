@@ -132,9 +132,9 @@ class PhotonDensity {
         float pixelsumB =0;
         int element = -1 ;
 
-        float maxpixelsumR =1;
-        float maxpixelsumG =1;
-        float maxpixelsumB =1;
+        float maxpixelsumR =0;
+        float maxpixelsumG =0;
+        float maxpixelsumB =0;
         float gmax = 0;
 
         for (int k=0; k<resolution_z; k++) {
@@ -143,7 +143,7 @@ class PhotonDensity {
               pixelsumG=0;
               pixelsumB=0;
               for (int i=0; i<resolution_x; i++)  {
-                 opt_decay =  pow( 
+                 opt_decay = pow( 
                      (  1 - (float(i))/float(resolution_x)  ) , optical_decay_power);
                  pixelsumR += get_element(R, i, j, k) / (opt_decay);
                  pixelsumG += get_element(G, i, j, k) / (opt_decay);

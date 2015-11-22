@@ -19,11 +19,21 @@ class MagneticField {
 //         r.push_back((strength*sin(x-50)/(x-50)));
 //         r.push_back((strength*sin(x-50)/(x-50)));
          r.push_back(0);
-         r.push_back(strength);
+         r.push_back(-strength);
          r.push_back(0);
          return r;
       }
 };
+
+
+class EnergyDensity {
+   public:
+
+
+};
+
+
+
 
 
 class ChargeDensity {
@@ -173,7 +183,7 @@ class ElectricField {
                   element++;
                   // poisson's equation: del^2 phi = - rho / epsilon_naught
                   elem[1]=0;
-                  elem[0] = - (double)(rho->p[element] / (sim->N*dx*dy*dz   ));
+                  elem[0] = (double)(rho->p[element] / (sim->N*dx*dy*dz   ));
 //                  if (elem[0]!=0){ cout << elem[0] << " ";}
                   in[element][0] = elem[0];
                   in[element][1] = elem[1];

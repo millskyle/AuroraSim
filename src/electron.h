@@ -170,20 +170,29 @@ public:
 
 
       x = A * sin(n*M_PI*(y-hshift)/sim->box_sizex) + shift;
-      z = (float)rand()/RAND_MAX* sim->box_sizez ;
+
+//      x = 3.0;
+//      y = 50.0;
+
+
+      if (sim->t > 1000) {
+         z = sim->box_sizez + 10*(float)rand()/RAND_MAX;
+      } else {
+         z = (float)rand()/RAND_MAX* sim->box_sizez ;
+      }
       randoms = gen_random(3);
      
-     /*if ((float)rand()/RAND_MAX > 0.98) {
-         y = 75.0 + (float)rand()/RAND_MAX;
-      } else {
-         y = 30.0 + (float)rand()/RAND_MAX;
-      }*/
+//     if ((float)rand()/RAND_MAX > 0.98) {
+//         y = 75.0 + (float)rand()/RAND_MAX;
+//      } else {
+//         y = 30.0 + (float)rand()/RAND_MAX;
+//      }
       
       E = 100000*sim->E_mean * (abs(randoms[0])+1.0);
-      vx = (0.01 * sqrt(2*E/sim->m_e) * randoms[1]);
-      vy = (0.01 * sqrt(2*E/sim->m_e) * randoms[2]);
+      vx = (0.001 * sqrt(2*E/sim->m_e) * randoms[1]);
+      vy = -(0.001 * sqrt(2*E/sim->m_e) * randoms[2]);
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
-      vz = -(sqrt( 2*E / sim->m_e - tmp ))  ;
+      vz = -(sqrt( 2*E / sim->m_e - tmp )) ;
       emitting = 0;
       emitting_time_left = 0;
       emitting_wavelength = 0;
