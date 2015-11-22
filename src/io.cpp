@@ -16,11 +16,11 @@ class PhotonDensity {
 
 
    public:
-      int resolution_x = 200; //divisions along the box dimension
-      int resolution_y = 200;
-      int resolution_z = 200;
+      int resolution_x = 600; //divisions along the box dimension
+      int resolution_y = 600;
+      int resolution_z = 600;
 
-      float optical_decay_power = 1.1; //light intensity drops off as distance to this power (vacuum would be 2.0) 
+      float optical_decay_power = 1.0; //light intensity drops off as distance to this power (vacuum would be 2.0) 
 
       float *R  = new float[resolution_x*resolution_y*resolution_z];
       float *G  = new float[resolution_x*resolution_y*resolution_z];
@@ -91,8 +91,11 @@ class PhotonDensity {
 
 
         maxR = get_max_voxel(R);
+       // *R = scalar_divide(R,maxR);
         maxG = get_max_voxel(G);
+//        *G = scalar_divide(R,maxR);
         maxB = get_max_voxel(B);
+//        *B = scalar_divide(R,maxR);
         float gmax; //global max brightness
         gmax = max(maxR,maxG);
         gmax = max(gmax,maxB);
@@ -100,15 +103,13 @@ class PhotonDensity {
         cout << "\rBrightest voxel had un-normed brightness of " << gmax << "                             ";
         cout.flush();
 
-//        *R = scalar_divide(R,gmax); 
-//        *G = scalar_divide(G,gmax); 
-//        *B = scalar_divide(B,gmax); 
-
-            
-
+        for (int i=0; i<(resolution_x*resolution_y*resolution_z); i++)  {
+           R[i] = R[i] / gmax;
+           G[i] = G[i] / gmax;
+           B[i] = B[i] / gmax;
+        }
+        
      }
-
-     
      
      int write_image(int t) {
         cout << "\rNormalizing for max brightness                                 " ;
@@ -134,6 +135,7 @@ class PhotonDensity {
         float maxpixelsumR =1;
         float maxpixelsumG =1;
         float maxpixelsumB =1;
+        float gmax = 0;
 
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
@@ -142,9 +144,9 @@ class PhotonDensity {
               pixelsumB=0;
               for (int i=0; i<resolution_x; i++)  {
                  opt_decay =  pow( 
-                     (  1 - float(i)/float(resolution_x)  ) , optical_decay_power);
-                 pixelsumR += get_element(R, i, j, k) / (0.8*opt_decay);
-                 pixelsumG += get_element(G, i, j, k) / (0.9*opt_decay);
+                     (  1 - (float(i))/float(resolution_x)  ) , optical_decay_power);
+                 pixelsumR += get_element(R, i, j, k) / (opt_decay);
+                 pixelsumG += get_element(G, i, j, k) / (opt_decay);
                  pixelsumB += get_element(B, i, j, k) / (opt_decay);
               }
               Rflat[k*resolution_y + j ] = pixelsumR;
@@ -153,21 +155,10 @@ class PhotonDensity {
               maxpixelsumR = max(maxpixelsumR,pixelsumR);
               maxpixelsumG = max(maxpixelsumG,pixelsumG);
               maxpixelsumB = max(maxpixelsumB,pixelsumB);
-/*                if (j==100) {
-                   Rflat[j*resolution_y + k] = 100;
-                   Gflat[j*resolution_y + k] = 100;
-                   Bflat[j*resolution_y + k] = 100;
-                } else {
-                   
-                   Rflat[j*resolution_y + k] = 0;
-                   Gflat[j*resolution_y + k] = 0;
-                   Bflat[j*resolution_y + k] = 0;
-                }
-*/
-
-
            }
         }
+
+        gmax = maxpixelsumB + maxpixelsumG + maxpixelsumR;
         element = -1;
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
@@ -182,12 +173,16 @@ class PhotonDensity {
               } else {
                  Rflat[element] = 0;
               }
+*/
 
-              */
+              
+//              img << Rflat[k*resolution_y + j]/maxpixelsumR << " "
+//                  << Gflat[k*resolution_y + j]/maxpixelsumG << " " 
+//                  << Bflat[k*resolution_y + j]/maxpixelsumB << "\n";
 
-              img << Rflat[k*resolution_y + j]/maxpixelsumR << " "
-                  << Gflat[k*resolution_y + j]/maxpixelsumG << " " 
-                  << Bflat[k*resolution_y + j]/maxpixelsumB << "\n";
+              img << Rflat[k*resolution_y + j]/gmax << " "
+                  << Gflat[k*resolution_y + j]/gmax << " " 
+                  << Bflat[k*resolution_y + j]/gmax << "\n";
            }
         }
         

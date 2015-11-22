@@ -56,7 +56,8 @@ int main() {
    cout << endl;
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
-      if (t%100==0 && t>500) {
+     sim.t = t;
+      if (t%500==0 && t>1) {
          photon_density.write_image(t);
          photon_density.reset();
 
@@ -120,7 +121,7 @@ int main() {
 
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
-            e->E -= 100*sim.hc / e->emitting_wavelength;
+            e->E -= 500*sim.hc / e->emitting_wavelength;
 //            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==0) {
@@ -128,7 +129,8 @@ int main() {
             }
             e->emitting_time_left -= 1;
             
-        if ( e->z < sim.box_sizez 
+        if ( e->z < sim.box_sizez
+          && e->z >=0
           && e->x >= 0 
           && e->x <= sim.box_sizex
           && e->y >= 0
@@ -137,12 +139,12 @@ int main() {
 
             if (e->emitting_wavelength == sim.wavelength_red ) {
                 photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*1.0) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152*79.0/255.0) ;
+//                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152*79.0/255.0) ;
             } else if (e->emitting_wavelength == sim.wavelength_green ) {
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*189.0/255.0) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.6*189.0/255.0) ;
                 photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
             } else if (e->emitting_wavelength == sim.wavelength_blue ) {
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*70./255.) ;
+//                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126*70./255.) ;
                 photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
             }
 
@@ -241,7 +243,7 @@ int main() {
          
       }
 
-      if (t%20==0) { E_field.compute(); }
+      if (t%3==0) { E_field.compute(); }
       rho.reset();
 
    }

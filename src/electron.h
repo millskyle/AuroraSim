@@ -1,6 +1,7 @@
 #ifndef ELECTRON
 #define ELECTRON
 
+
 #include <vector> 
 #include <math.h>
 #include "utility_functions.h" 
@@ -96,7 +97,7 @@ public:
 
    }
    float get_p_interaction(float h) {
-      return exp(-3*x/sim->box_sizez)*(get_p_emit_red(h) + get_p_emit_green(h) +  get_p_emit_blue(h)) ;
+      return 0.001 * exp(-6*h/sim->box_sizez)*(get_p_emit_red(h) + get_p_emit_green(h) +  get_p_emit_blue(h)) ;
    }
 
    //times that each emission should be active for  
@@ -134,8 +135,14 @@ public:
 
    }
 
-   
+   float A;
+   float shift;
+   float n;
+   float hshift;
+
    int reset() {
+      
+      
       if (ID==3) {
          cout << "Respawning" << endl;
          cout << "  at respawn: Fx=" << Fx << "   Fy=" << Fy << "   Fz="<<Fz << endl;
@@ -147,12 +154,23 @@ public:
       y = sim->box_sizey* (float)rand() / RAND_MAX;
 
 
-      float A = sim->box_sizex/2.0;
-      float shift = sim->box_sizex/2.0;
-      float N = 6.0;
 
-      x = A * sin(N*M_PI*y/sim->box_sizex) + shift;
-      z = (float)rand()/RAND_MAX * sim->box_sizez ;
+      if ((float)rand()/RAND_MAX > 0.4) {
+         A = sim->box_sizex/2.0 - 1.0;
+         shift = sim->box_sizex/2.0;
+         n = 6.0;
+         hshift = sim->t/3000.0;
+      } else {
+         A = sim->box_sizex/2.0 - 1.0;
+         shift = sim->box_sizex/2.0;
+         n = 4.23455;
+         hshift = -sim->t / 1000.00;
+      }
+
+
+
+      x = A * sin(n*M_PI*(y-hshift)/sim->box_sizex) + shift;
+      z = (float)rand()/RAND_MAX* sim->box_sizez ;
       randoms = gen_random(3);
      
      /*if ((float)rand()/RAND_MAX > 0.98) {
@@ -162,10 +180,10 @@ public:
       }*/
       
       E = 100000*sim->E_mean * (abs(randoms[0])+1.0);
-      vx = (0.0001 * sqrt(2*E/sim->m_e) * randoms[1]);
-      vy = (0.0001 * sqrt(2*E/sim->m_e) * randoms[2]);
+      vx = (0.01 * sqrt(2*E/sim->m_e) * randoms[1]);
+      vy = (0.01 * sqrt(2*E/sim->m_e) * randoms[2]);
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
-      vz = -(sqrt( 2*E / sim->m_e - tmp )) +10 ;
+      vz = -(sqrt( 2*E / sim->m_e - tmp ))  ;
       emitting = 0;
       emitting_time_left = 0;
       emitting_wavelength = 0;
