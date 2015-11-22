@@ -22,6 +22,14 @@ class PhotonDensity {
 
       float optical_decay_power = 1.6; //light intensity drops off as distance to this power (vacuum would be 2.0) 
 
+
+      Simulation* sim;
+
+      int init(Simulation *s) {
+         sim = s;
+         return 0;
+      }
+      
       float *R  = new float[resolution_x*resolution_y*resolution_z];
       float *G  = new float[resolution_x*resolution_y*resolution_z];
       float *B  = new float[resolution_x*resolution_y*resolution_z];
@@ -142,26 +150,26 @@ class PhotonDensity {
               pixelsumR=0;
               pixelsumG=0;
               pixelsumB=0;
-              for (int i=0.3*resolution_x; i<resolution_x; i++)  {
+              for (int i=0; i<resolution_x; i++)  {
                  opt_decay = pow( 
                      (  1 - (float(i))/float(resolution_x)  ) , optical_decay_power);
-                 pixelsumR += get_element(R, i, j, k) / (opt_decay*0.7*resolution_x);
-                 pixelsumG += get_element(G, i, j, k) / (opt_decay*0.7*resolution_x);
-                 pixelsumB += get_element(B, i, j, k) / (opt_decay*0.7*resolution_x);
+                 pixelsumR += get_element(R, i, j, k) / (opt_decay);
+                 pixelsumG += get_element(G, i, j, k) / (opt_decay);
+                 pixelsumB += get_element(B, i, j, k) / (opt_decay);
               }
               Rflat[k*resolution_y + j ] = pixelsumR;
               Gflat[k*resolution_y + j ] = pixelsumG;
               Bflat[k*resolution_y + j ] = pixelsumB;
-              maxpixelsumR = max(maxpixelsumR,pixelsumR);
-              maxpixelsumG = max(maxpixelsumG,pixelsumG);
-              maxpixelsumB = max(maxpixelsumB,pixelsumB);
+//              maxpixelsumR = max(maxpixelsumR,pixelsumR);
+//              maxpixelsumG = max(maxpixelsumG,pixelsumG);
+//              maxpixelsumB = max(maxpixelsumB,pixelsumB);
            }
         }
 
-        gmax = (maxpixelsumB + maxpixelsumG + maxpixelsumR) ;
-        cout << "!!" << gmax << "!!" << endl;
+//        gmax = (maxpixelsumB + maxpixelsumG + maxpixelsumR) ;
+//        cout << "!!" << gmax << "!!" << endl;
         element = -1;
-        gmax = 150.0;
+        gmax = (float)sim->N * 0.66 ;
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
               element++;

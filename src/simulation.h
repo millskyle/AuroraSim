@@ -17,7 +17,7 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 100000;
+      int N = 1000000;
       int tmax = 100000;
       int t = 0;
 
@@ -39,9 +39,9 @@ class Simulation {
 //      int timescale_green_emission = 50.;// 0.7/dt;
 //      int timescale_blue_emission = 2.;// 0.001/dt;
       
-      int timescale_red_emission = 50.; //110/dt;
+      int timescale_red_emission = 500.; //110/dt;
       int timescale_green_emission = 50.;// 0.7/dt;
-      int timescale_blue_emission = 50.;// 0.001/dt;
+      int timescale_blue_emission = 5.;// 0.001/dt;
 
 
       float wavelength_red = 500.0;

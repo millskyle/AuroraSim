@@ -24,6 +24,7 @@ int main() {
    Simulation sim;
    sim.seed(); //generate random numbers that will be the same throughout program execution
    PhotonDensity photon_density;
+   photon_density.init(&sim);
    OutputReport report;
    report.init();
    MagneticField mag_field;
@@ -121,7 +122,7 @@ int main() {
 
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
-            e->E -= 100*sim.hc / e->emitting_wavelength;
+            e->E -= 500*sim.hc / e->emitting_wavelength;
 //            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==0) {
@@ -154,7 +155,7 @@ int main() {
 //                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.0722) ;
 //                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
                 photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.9*70./255.) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.9) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,1.8) ;
             }
 
         }
@@ -201,9 +202,9 @@ int main() {
          B = mag_field.at(e->x,e->y,e->z,t);
 
 
-         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e7 ;
-         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e7;
-         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e7 ;
+         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e0 ;
+         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e0;
+         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e0 ;
  
          
 
