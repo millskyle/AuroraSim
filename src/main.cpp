@@ -143,6 +143,7 @@ int main() {
 //                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.2126) ;
 //                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2126) ;
                 photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.9*1.0) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.6*1.0) ;
                 photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.9*79.0/255.0) ;
             } else if (e->emitting_wavelength == sim.wavelength_green ) {
 //                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.7152) ;
@@ -208,9 +209,9 @@ int main() {
  
          
 
-         e->Fx += 1e6*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
-         e->Fy += 1e6*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
-         e->Fz += 1e6*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
+         e->Fx += 1e9*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
+         e->Fy += 1e9*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
+         e->Fz += 1e9*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
 
  //        e->Fx = 0;
  //        e-> Fy = 0;

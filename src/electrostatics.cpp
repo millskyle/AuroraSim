@@ -38,9 +38,9 @@ class EnergyDensity {
 
 class ChargeDensity {
    public:
-      int resolution_x = 40;
-      int resolution_y = 40;
-      int resolution_z = 40;
+      int resolution_x = 80;
+      int resolution_y = 80;
+      int resolution_z = 80;
 
       float *p = new float[resolution_x*resolution_y*resolution_z];
     
@@ -81,19 +81,19 @@ class ElectricField {
       float *Ex ;//= new float[Nx*Ny*Nz];
       float *Ey ;//= new float[Nx*Ny*Nz];
       float *Ez ;//= new float[Nx*Ny*Nz];
-         fftw_complex *in ;// = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *out  ;// = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *in2  ;// = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *out2  ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *in ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *out  ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *in2  ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *out2  ;// = new fftw_complex[Nx*Ny*Nz];
 
-         fftw_complex *inPhiX  ;// = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *outEX  ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *inPhiX  ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *outEX  ;// = new fftw_complex[Nx*Ny*Nz];
 
-         fftw_complex *inPhiY  ;// = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *outEY  ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *inPhiY  ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *outEY  ;// = new fftw_complex[Nx*Ny*Nz];
 
-         fftw_complex *inPhiZ  ;// = new fftw_complex[Nx*Ny*Nz];
-         fftw_complex *outEZ  ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *inPhiZ  ;// = new fftw_complex[Nx*Ny*Nz];
+      fftw_complex *outEZ  ;// = new fftw_complex[Nx*Ny*Nz];
 
 
       int init(Simulation *simm, ChargeDensity *rhoo) {
@@ -240,14 +240,14 @@ class ElectricField {
           tmpReal /= -sim->epsilon_naught;
           tmpImag /= -sim->epsilon_naught;
 
-          inPhiX[element][1] =  -tmpReal * wavenumber_x ;
-          inPhiX[element][0] =  tmpImag * wavenumber_x ;
+          inPhiX[element][1] =  -tmpReal * wavenumber_x * wavenumber_x;
+          inPhiX[element][0] =  tmpImag * wavenumber_x * wavenumber_x;
           
-          inPhiY[element][1] = -tmpReal * wavenumber_y ;
-          inPhiY[element][0] =  tmpImag * wavenumber_y ;
+          inPhiY[element][1] = -tmpReal * wavenumber_y * wavenumber_y;
+          inPhiY[element][0] =  tmpImag * wavenumber_y * wavenumber_y;
           
-          inPhiZ[element][1] = -tmpReal * wavenumber_z ;
-          inPhiZ[element][0] = tmpImag * wavenumber_z ;
+          inPhiZ[element][1] = -tmpReal * wavenumber_z * wavenumber_z;
+          inPhiZ[element][0] = tmpImag * wavenumber_z * wavenumber_z;
 
           // in2[element][0] = - out[element][0] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20);
           // in2[element][1] = - out[element][1] / (pow(wavenumber_x,2) + pow(wavenumber_y,2) + pow(wavenumber_z,2) + 1e-20) ;

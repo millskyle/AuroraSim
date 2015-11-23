@@ -146,6 +146,7 @@ class PhotonDensity {
         float gmax = 0;
 
         for (int k=0; k<resolution_z; k++) {
+           cout << "z=" << k << endl;
            for (int j=0; j<resolution_y; j++) {
               pixelsumR=0;
               pixelsumG=0;
