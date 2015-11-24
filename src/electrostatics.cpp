@@ -26,16 +26,6 @@ class MagneticField {
 };
 
 
-class EnergyDensity {
-   public:
-
-
-};
-
-
-
-
-
 class ChargeDensity {
    public:
       int resolution_x =128 ;
