@@ -11,6 +11,42 @@
 using namespace std;
 
 
+class EnergyDensity {
+   public:
+      int resolution_z ;
+
+      float *energy_density; 
+
+
+      int init(int resz) {
+         resolution_z = resz;
+         energy_density = new float[resz];
+         for (int i=0; i< resolution_z; i++) {
+            energy_density[i] = 0;
+         }
+      }
+
+
+      int increment(int i, float n) {
+         energy_density[i]+=n;
+      }
+
+
+
+      int write_out(int t) {
+         ofstream energy_density_out;
+         energy_density_out.open("energy/E_density_" + to_string(t) + ".dat");
+         for (int i=0; i<resolution_z; i++) {
+            energy_density_out << energy_density[i] << "\t" << i << "\n";
+         }
+         energy_density_out.close();
+      }
+
+
+};
+
+
+
 
 class PhotonDensity {
 

@@ -25,6 +25,8 @@ int main() {
    sim.seed(); //generate random numbers that will be the same throughout program execution
    PhotonDensity photon_density;
    photon_density.init(&sim);
+   EnergyDensity energy_density;
+   energy_density.init(photon_density.resolution_z);
    OutputReport report;
    report.init();
    MagneticField mag_field;
@@ -61,6 +63,7 @@ int main() {
       if (t%10==0 && t>19) {
          photon_density.write_image(t);
          photon_density.reset();
+         energy_density.write_out(t);
 
       }
 
@@ -123,6 +126,7 @@ int main() {
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
             e->E -= 100*sim.hc / e->emitting_wavelength;
+            energy_density.increment(voxelz,100*sim.hc / e->emitting_wavelength);
 //            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==0) {
