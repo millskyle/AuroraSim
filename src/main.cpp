@@ -122,7 +122,7 @@ int main() {
 
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
-            e->E -= 500*sim.hc / e->emitting_wavelength;
+            e->E -= 100*sim.hc / e->emitting_wavelength;
 //            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
             if(e->ID==0) {
@@ -143,7 +143,7 @@ int main() {
 //                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.2126) ;
 //                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2126) ;
                 photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.9*1.0) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.6*1.0) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.4*1.0) ;
                 photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.9*79.0/255.0) ;
             } else if (e->emitting_wavelength == sim.wavelength_green ) {
 //                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.7152) ;
@@ -203,15 +203,15 @@ int main() {
          B = mag_field.at(e->x,e->y,e->z,t);
 
 
-         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e0 ;
-         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e0;
-         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e0 ;
+//         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e-1 ;
+//         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e-1;
+//         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e-1 ;
  
          
 
-         e->Fx += 1e9*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
-         e->Fy += 1e9*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
-         e->Fz += 1e9*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
+         e->Fx += 1.0e10/sim.N*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
+         e->Fy += 1.0e10/sim.N*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
+         e->Fz += 1.0e10/sim.N*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
 
  //        e->Fx = 0;
  //        e-> Fy = 0;
@@ -241,6 +241,17 @@ int main() {
          e->z += e->vz * sim.dt;
          
 //if (e->ID==3) cout << endl << e->z << "   "  << e->p_emit_r << "  " << e->p_emit_g << "  " << e->p_emit_b << "  "<< e->p_emit ;
+
+//         periodic_boundary_conditions:
+           while (e->x < 0) {e->x += sim.box_sizex;}
+           while (e->y < 0) {e->y += sim.box_sizey;}
+//           while (e->z < 0) {e->z += sim.box_sizez;}
+
+//           while (e->x > sim.box_sizex) {e->x -= sim.box_sizex;}
+//           while (e->y > sim.box_sizey) {e->y -= sim.box_sizey;}
+//           while (e->z > sim.box_sizez) {e->z -= sim.box_sizez;}
+           
+
         
          if (e->ID==3) cout << t << "\t" << e->x << "\t" << e->y << "\t" << e->z 
                             << "\tE: " << e->E <<  "\t"  << e->Fx << "\t" << e->Fy << "\t" << e->Fz 
@@ -252,7 +263,7 @@ int main() {
          
       }
 
-      if (t%1==0) { E_field.compute(); }
+      if (t%1==0 ) { E_field.compute(); }
       rho.reset();
 
    }

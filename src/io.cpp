@@ -146,21 +146,21 @@ class PhotonDensity {
         float gmax = 0;
 
         for (int k=0; k<resolution_z; k++) {
-           cout << "z=" << k << endl;
-           for (int j=0; j<resolution_y; j++) {
+         //  cout << "z=" << k << endl;
+           for (int i=0; i<resolution_x; i++) {
               pixelsumR=0;
               pixelsumG=0;
               pixelsumB=0;
-              for (int i=0; i<resolution_x; i++)  {
+              for (int j=0; j<resolution_y; j++)  {
                  opt_decay = pow( 
-                     (  1 - (float(i))/float(resolution_x)  ) , optical_decay_power);
+                     (  1.1 - (float(j))/float(resolution_y)  ) , optical_decay_power);
                  pixelsumR += get_element(R, i, j, k) / (opt_decay);
                  pixelsumG += get_element(G, i, j, k) / (opt_decay);
                  pixelsumB += get_element(B, i, j, k) / (opt_decay);
               }
-              Rflat[k*resolution_y + j ] = pixelsumR;
-              Gflat[k*resolution_y + j ] = pixelsumG;
-              Bflat[k*resolution_y + j ] = pixelsumB;
+              Rflat[k*resolution_y + i ] = pixelsumR;
+              Gflat[k*resolution_y + i ] = pixelsumG;
+              Bflat[k*resolution_y + i ] = pixelsumB;
 //              maxpixelsumR = max(maxpixelsumR,pixelsumR);
 //              maxpixelsumG = max(maxpixelsumG,pixelsumG);
 //              maxpixelsumB = max(maxpixelsumB,pixelsumB);
@@ -170,7 +170,7 @@ class PhotonDensity {
 //        gmax = (maxpixelsumB + maxpixelsumG + maxpixelsumR) ;
 //        cout << "!!" << gmax << "!!" << endl;
         element = -1;
-        gmax = (float)sim->N * 0.66 ;
+        gmax = (float)sim->N * pow(sim->box_sizex / resolution_x,-3) * 0.03 ;
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
               element++;
