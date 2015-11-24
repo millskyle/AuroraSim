@@ -17,7 +17,7 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 1e7;
+      int N = 1e5;
       int tmax = 100000;
       int t = 0;
 

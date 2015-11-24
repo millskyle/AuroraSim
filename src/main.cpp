@@ -179,11 +179,11 @@ int main() {
        
         if (
              voxelx >= 0 
-          && voxelx<=rho.resolution_x 
+          && voxelx<rho.resolution_x 
           && voxely >= 0 
-          && voxely<=rho.resolution_y 
+          && voxely<rho.resolution_y 
           && voxelz >= 0 
-          && voxelz<=rho.resolution_z) {
+          && voxelz<rho.resolution_z) {
         
         rho.incr_element(voxelx,voxely,voxelz);  
         
@@ -209,9 +209,9 @@ int main() {
  
          
 
-         e->Fx += 1.0e10/sim.N*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
-         e->Fy += 1.0e10/sim.N*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
-         e->Fz += 1.0e10/sim.N*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
+         e->Fx += 1.0e12/sim.N*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
+         e->Fy += 1.0e12/sim.N*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
+         e->Fz += 1.0e12/sim.N*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
 
  //        e->Fx = 0;
  //        e-> Fy = 0;

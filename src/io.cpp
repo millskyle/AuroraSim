@@ -16,9 +16,9 @@ class PhotonDensity {
 
 
    public:
-      int resolution_x = 600; //divisions along the box dimension
-      int resolution_y = 600;
-      int resolution_z = 600;
+      int resolution_x = 400; //divisions along the box dimension
+      int resolution_y = 400;
+      int resolution_z = 400;
 
       float optical_decay_power = 1.6; //light intensity drops off as distance to this power (vacuum would be 2.0) 
 
@@ -170,7 +170,7 @@ class PhotonDensity {
 //        gmax = (maxpixelsumB + maxpixelsumG + maxpixelsumR) ;
 //        cout << "!!" << gmax << "!!" << endl;
         element = -1;
-        gmax = (float)sim->N * pow(sim->box_sizex / resolution_x,-3) * 0.03 ;
+        gmax = (float)sim->N * pow(((float)resolution_x / (float)sim->box_sizex),3)  * 0.03 ;
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
               element++;

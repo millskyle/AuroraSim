@@ -38,7 +38,7 @@ class EnergyDensity {
 
 class ChargeDensity {
    public:
-      int resolution_x = 128 ;
+      int resolution_x =128 ;
       int resolution_y = 128 ;
       int resolution_z = 128 ;
 

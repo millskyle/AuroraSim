@@ -153,8 +153,8 @@ public:
       t = 0;
       
       
-      y = 0.75 * sim->box_sizey* (float)rand() / RAND_MAX + 0.125*sim->box_sizey;
-      x = 0.75 * sim->box_sizex* (float)rand() / RAND_MAX + 0.125*sim->box_sizex;
+      y = 0.6 * sim->box_sizey* (float)rand() / RAND_MAX + 0.2*sim->box_sizey;
+      x = 0.6 * sim->box_sizex* (float)rand() / RAND_MAX + 0.2*sim->box_sizex;
 //      y = sim->box_sizey* (float)rand() / RAND_MAX;
 //      x = sim->box_sizex* (float)rand() / RAND_MAX;
 
@@ -182,7 +182,7 @@ public:
 //      y = 50.0;
 
 
-      if (sim->t > 10000) {
+      if (sim->t > 100) {
          z = sim->box_sizez + 10*(float)rand()/RAND_MAX;
       } else {
          z = (float)rand()/RAND_MAX* sim->box_sizez ;
