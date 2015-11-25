@@ -96,6 +96,11 @@ class ElectricField {
          Ly = sim->box_sizey ;
          Lz = sim->box_sizez ;
 
+         
+                 
+         
+         
+         
          Ex = new float[Nx*Ny*Nz];
          Ey = new float[Nx*Ny*Nz];
          Ez = new float[Nx*Ny*Nz];
@@ -265,7 +270,27 @@ rho_out.close();
 }
 
          
+void cleanup() {
+ 
+         delete[] Ex;
+         delete[] Ey;
+         delete[] Ey;
 
+         delete[] in;
+         delete[] out;
+         delete[] in2;
+         delete[] out2;
+         delete[] inPhiX;
+         delete[] outEX;
+         
+         delete[] inPhiY;
+         delete[] outEY;
+         
+         delete[] inPhiY;
+         delete[] outEY;
+         
+
+}
 
 
 
