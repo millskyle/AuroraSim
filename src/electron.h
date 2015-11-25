@@ -34,8 +34,7 @@ public:
    float t;
    float ID;
    float tmp;
-   vector<float>  rands;
-   
+   float rnd; 
 
    float p_emit=0;
    float p_emit_r=0;
@@ -104,21 +103,23 @@ public:
 
    //times that each emission should be active for  
    float get_t_emit_red() {
-      vector<float> rnd = gen_random(2);
-      return (rnd[0]+1) * sim->timescale_red_emission;
+      float rnd = gen_random();
+      return (rnd+1) * sim->timescale_red_emission;
    }
    float get_t_emit_green() {
-      vector<float> rnd = gen_random(2);
-      return (rnd[0]+1) * sim->timescale_green_emission;
+      float rnd = gen_random();
+      return (rnd+1) * sim->timescale_green_emission;
    }
    float get_t_emit_blue() {
-      vector<float> rnd = gen_random(2);
-      return (rnd[0]+1) * sim->timescale_blue_emission;
+      float rnd = gen_random();
+      return (rnd+1) * sim->timescale_blue_emission;
    }
 
    int random_collision() {
-      vector<float> rands = gen_random(4);
-      float theta = 2*M_PI*abs(rands[0]);
+      float rnd = gen_random();
+
+
+      float theta = 2*M_PI*abs(rnd);
       vx = vx * cos(theta);
       vy = vy * sin(theta);
       vz = -sqrt( 2*E / sim->m_e - (vx*vx + vy*vy) );
@@ -187,15 +188,16 @@ public:
       } else {
          z = (float)rand()/RAND_MAX* sim->box_sizez ;
       }
-      randoms = gen_random(3);
      
 //     if ((float)rand()/RAND_MAX > 0.98) {
 //         y = 75.0 + (float)rand()/RAND_MAX;
 //      } else {
 //         y = 30.0 + (float)rand()/RAND_MAX;
 //      }
-      
-      E = 100000*sim->E_mean * (abs(randoms[0])+1.0);
+ 
+      rnd = gen_random();
+
+      E = 100000*sim->E_mean * (abs(rnd)+1.0);
       vx = 0.00; //(0.001 * sqrt(2*E/sim->m_e) * randoms[1]);
       vy = 0.00; //-(0.001 * sqrt(2*E/sim->m_e) * randoms[2]);
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity

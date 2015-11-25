@@ -8,19 +8,14 @@ using namespace std;
 
 
 
-vector<float> gen_random(int N) {
+float gen_random() {
    // """Return a vector of (N/2 + N%2) elements sampled from a normal distribution """
-    vector<float> ret;
-    float rnd1;
-    float rnd2;
-    //for (int i=0; i<int(((float)N/2.0) +1); i++ ) {
-    for (int i=0; i<(N+4); i++ ) {
-       rnd1 = (float)rand() / RAND_MAX;
-       rnd2 = (float)rand() / RAND_MAX;
-       ret.push_back( sqrt( -2.0 * log(rnd1)) * cos( 2 * M_PI * rnd2)   );
-       ret.push_back( sqrt( -2.0 * log(rnd1)) * sin( 2 * M_PI * rnd2)   );
-    }
-    return ret;
+    float rnd1 = (float)rand() / RAND_MAX;
+    float rnd2 = (float)rand() / RAND_MAX;
+    return sqrt( -2.0 * log(rnd1)) * cos( 2 * M_PI * rnd2) ;
+//       ret.push_back( sqrt( -2.0 * log(rnd1)) * sin( 2 * M_PI * rnd2)   );
+//    }
+//    return ret;
 }
 
 #endif

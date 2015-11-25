@@ -60,9 +60,9 @@ int main() {
    cout << "Beginning to integrate: " << endl;
    for (t=0; t< sim.tmax; t++ ) {
      sim.t = t;
-      if (t%10==0 && t>19) {
-   //      photon_density.write_image(t);
-   //      photon_density.reset();
+      if (t%5==0 && t>19) {
+         photon_density.write_image(t);
+         photon_density.reset();
          energy_density.write_out(t);
 
       }
@@ -202,7 +202,7 @@ int main() {
          e->Fz = 0;
          //rescale the velocities according to the new energy
 
-         randoms = gen_random(3);
+//         randoms = gen_random(3);
 
          B = mag_field.at(e->x,e->y,e->z,t);
 
@@ -267,7 +267,7 @@ int main() {
          
       }
 
-      if (t%50==0 ) { E_field.compute(); }
+      if (t%1==0 ) { E_field.compute(); }
       rho.reset();
 
    }
