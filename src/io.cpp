@@ -60,6 +60,8 @@ class PhotonDensity {
       int resolution_x = 400; //divisions along the box dimension
       int resolution_y = 400;
       int resolution_z = 400;
+        
+      ofstream img;
 
       float optical_decay_power = 1.6; //light intensity drops off as distance to this power (vacuum would be 2.0) 
 
@@ -86,27 +88,8 @@ class PhotonDensity {
 
       }
 
-   
       int incr_element(float *A ,int i, int j, int k,float n) {      
          A[i + resolution_x *( j + resolution_y * k) ] += n;
-         /*if (i>1 && i<resolution_x-2) {
-            A[(i+1) + resolution_x *( j + resolution_y * k) ] += n/4.0;
-            A[(i-1) + resolution_x *( j + resolution_y * k) ] += n/4.0;
-         }
-         if (j>1 && j < resolution_y-2) {
-            A[i + resolution_x *( (j+1) + resolution_y * k) ] += n/4.0;
-            A[i + resolution_x *( (j-1) + resolution_y * k) ] += n/4.0;
-         }
-         if (k>1 && k < resolution_z-2) {
-            A[i + resolution_x *( j + resolution_y * (k-1)) ] += n/4.0;
-            A[i + resolution_x *( j + resolution_y * (k+1)) ] += n/4.0;
-         }
-
-      */
-
-
-
-
          return 0;
       }
 
@@ -165,7 +148,6 @@ class PhotonDensity {
         cout.flush();
 //        normalize();
 
-        ofstream img;
         img.open("output/" + to_string(t) + ".dat");
 
         img << resolution_y << " " << resolution_z << "\n";
@@ -215,23 +197,7 @@ class PhotonDensity {
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
               element++;
-/*              if ( Rflat[element] > Gflat[element] ) {
-                 Gflat[element] = 0;
-              } else {
-                 Rflat[element] =0; 
-              }
-              if (Rflat[element] > Bflat[element]) {
-                 Bflat[element] = 0;
-              } else {
-                 Rflat[element] = 0;
-              }
-*/
-
               
-//              img << Rflat[k*resolution_y + j]/maxpixelsumR << " "
-//                  << Gflat[k*resolution_y + j]/maxpixelsumG << " " 
-//                  << Bflat[k*resolution_y + j]/maxpixelsumB << "\n";
-
               img << Rflat[k*resolution_y + j]/gmax << " "
                   << Gflat[k*resolution_y + j]/gmax << " " 
                   << Bflat[k*resolution_y + j]/gmax << "\n";
@@ -239,14 +205,12 @@ class PhotonDensity {
         }
         
         img.close();
-
-          
-
-
+       
+       
        delete[] Rflat;
        delete[] Gflat;
        delete[] Bflat;
-          return 0;
+       return 0;
 
      }
     

@@ -204,7 +204,7 @@ int main() {
 
 //         randoms = gen_random(3);
 
-         B = mag_field.at(t,e->x,e->y,e->z);
+//         B = mag_field.at(t,e->x,e->y,e->z);
 
 
 //         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e-1 ;

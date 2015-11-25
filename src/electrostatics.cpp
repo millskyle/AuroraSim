@@ -97,6 +97,9 @@ class ElectricField {
       fftw_plan inverseX;
       fftw_plan inverseY;
       fftw_plan inverseZ;
+      
+      ofstream rho_out;
+      ofstream debugfile;
 
       int init(Simulation *simm, ChargeDensity *rhoo) {
          sim = simm;
@@ -119,10 +122,9 @@ class ElectricField {
          Ex = new float[Nx*Ny*Nz];
          Ey = new float[Nx*Ny*Nz];
          Ez = new float[Nx*Ny*Nz];
+
          in = new fftw_complex[Nx*Ny*Nz];
          out = new fftw_complex[Nx*Ny*Nz];
-         in2 = new fftw_complex[Nx*Ny*Nz];
-         out2 = new fftw_complex[Nx*Ny*Nz];
                           
          inPhiX = new fftw_complex[Nx*Ny*Nz];
          outEX = new fftw_complex[Nx*Ny*Nz];
@@ -133,11 +135,7 @@ class ElectricField {
          inPhiZ = new fftw_complex[Nx*Ny*Nz];
          outEZ = new fftw_complex[Nx*Ny*Nz];
 
-         forward = fftw_plan_dft_3d(Nx,Ny,Nz,in, out, FFTW_FORWARD, FFTW_MEASURE );
-         inverseX = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiX, outEX, FFTW_BACKWARD, FFTW_MEASURE );
-         inverseY = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiY, outEY, FFTW_BACKWARD, FFTW_MEASURE );
-         inverseZ = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiZ, outEZ, FFTW_BACKWARD, FFTW_MEASURE );
-        
+       
 
 
       }
@@ -146,6 +144,8 @@ class ElectricField {
          A[i + Nx *( j + Ny * k) ] = val ;
          return 0;
       }
+      
+      
       float get_element(float* A, int i, int j, int k) {
          if ( i >= 0 && i < Nx && j >= 0 && j < Ny && k>=0 && k < Nz ) {
             return A[i + Nx *( j + Ny * k) ] ;
@@ -154,24 +154,22 @@ class ElectricField {
          }
       }
    
-      int compute() {
 
-         ofstream debugfile;
+      int compute() {       
          debugfile.open("fftw.plt");
-
-
          double elem[2] = {0};
-
-                  int element = -1;
-
+         int element = -1;
          float wavenumber_x = 0;
          float wavenumber_y = 0;
          float wavenumber_z = 0;
-
          
-         ofstream rho_out;
          rho_out.open("rho/rho_" + to_string(sim->t) + ".dat");
-
+      
+         forward = fftw_plan_dft_3d(Nx,Ny,Nz,in, out, FFTW_FORWARD, FFTW_MEASURE );
+         inverseX = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiX, outEX, FFTW_BACKWARD, FFTW_MEASURE );
+         inverseY = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiY, outEY, FFTW_BACKWARD, FFTW_MEASURE );
+         inverseZ = fftw_plan_dft_3d(Nx,Ny,Nz,inPhiZ, outEZ, FFTW_BACKWARD, FFTW_MEASURE );
+       
          element = -1 ;
          for (int k=0; k<Nz; k++) {
             for (int j=0; j<Ny; j++) {
@@ -189,7 +187,7 @@ class ElectricField {
             }
          }
 
-         fftw_execute(forward);
+      fftw_execute(forward);
 
       double tmpReal;
       double tmpImag;
