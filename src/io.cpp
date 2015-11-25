@@ -243,11 +243,23 @@ class PhotonDensity {
 
           
 
+
+       delete[] Rflat;
+       delete[] Gflat;
+       delete[] Bflat;
           return 0;
 
-
      }
-     
+    
+
+
+    void cleanup() {
+       delete[] R;
+       delete[] G;
+       delete[] B;
+    }
+       
+
 
 };
 
