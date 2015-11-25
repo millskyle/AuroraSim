@@ -274,17 +274,18 @@ void cleanup() {
  
          delete[] Ex;
          delete[] Ey;
-         delete[] Ey;
+         delete[] Ez;
 
          delete[] in;
          delete[] out;
          delete[] in2;
          delete[] out2;
+
          delete[] inPhiX;
          delete[] outEX;
          
-         delete[] inPhiY;
-         delete[] outEY;
+         delete[] inPhiZ;
+         delete[] outEZ;
          
          delete[] inPhiY;
          delete[] outEY;

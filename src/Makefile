@@ -8,6 +8,9 @@ main: $(files)
 debug: $(files) 
 	$(CXX) -g -std=c++11 main.cpp -L/usr/include -lfftw3 -orun && gdb ./run
 
+valgrind: $(files) 
+	$(CXX) -g -std=c++11 main.cpp -L/usr/include -lfftw3 -orun && valgrind ./run
+
 clang: $(files)
 	clang++ -g -std=c++11 main.cpp -L/usr/include -lfftw3 -orun
 

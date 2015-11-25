@@ -27,8 +27,8 @@ int main() {
    photon_density.init(&sim);
    EnergyDensity energy_density;
    energy_density.init(photon_density.resolution_z);
-   OutputReport report;
-   report.init();
+//   OutputReport report;
+//   report.init();
    MagneticField mag_field;
    ChargeDensity rho;
    ElectricField E_field;
@@ -61,8 +61,8 @@ int main() {
    for (t=0; t< sim.tmax; t++ ) {
      sim.t = t;
       if (t%10==0 && t>19) {
-         photon_density.write_image(t);
-         photon_density.reset();
+   //      photon_density.write_image(t);
+   //      photon_density.reset();
          energy_density.write_out(t);
 
       }
@@ -89,9 +89,9 @@ int main() {
             e->t = t;
          }
         
-        if (t==300) {
-           report.initial_positions_file << e->x << " " << e->y <<  endl;
-        }
+//        if (t==300) {
+//           report.initial_positions_file << e->x << " " << e->y <<  endl;
+//        }
 
         voxelx = int((float)photon_density.resolution_x / (float)sim.box_sizex * e->x);
         voxely = int((float)photon_density.resolution_y / (float)sim.box_sizey * e->y);
@@ -129,9 +129,9 @@ int main() {
             energy_density.increment(voxelz,100*sim.hc / e->emitting_wavelength);
 //            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
-            if(e->ID==0) {
-               report.EvsT.push_back(e->E);
-            }
+//            if(e->ID==0) {
+//               report.EvsT.push_back(e->E);
+//              }
             e->emitting_time_left -= 1;
             
         if ( e->z < sim.box_sizez
@@ -267,7 +267,7 @@ int main() {
          
       }
 
-      if (t%1==0 ) { E_field.compute(); }
+      if (t%50==0 ) { E_field.compute(); }
       rho.reset();
 
    }

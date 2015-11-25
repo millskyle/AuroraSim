@@ -16,6 +16,7 @@ class EnergyDensity {
       int resolution_z ;
 
       float *energy_density; 
+      ofstream energy_density_out;
 
 
       int init(int resz) {
@@ -34,7 +35,6 @@ class EnergyDensity {
 
 
       int write_out(int t) {
-         ofstream energy_density_out;
          energy_density_out.open("energy/E_density_" + to_string(t) + ".dat");
          for (int i=0; i<resolution_z; i++) {
             energy_density_out << energy_density[i] << "\t" << i << "\n";
@@ -44,9 +44,8 @@ class EnergyDensity {
 
 
 
-    int cleanup() {
-       delete[] energy_density;
-       return 0;
+    void cleanup() {
+    //   delete[] energy_density;
     }
 
 };
@@ -266,7 +265,7 @@ class PhotonDensity {
 
 
 
-class OutputReport {
+/*class OutputReport {
   public:
     vector<float> EvsT;
     int interactions;
@@ -298,6 +297,7 @@ class OutputReport {
     }
 
 };
+*/
 
 
 #endif
