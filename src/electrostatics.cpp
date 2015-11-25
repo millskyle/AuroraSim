@@ -150,7 +150,6 @@ class ElectricField {
          debugfile.open("fftw.plt");
 
 
-         float *phi = new float[Nx*Ny*Nz];
          double elem[2] = {0};
 
          fftw_plan forward;
