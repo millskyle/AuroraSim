@@ -49,8 +49,9 @@ class ChargeDensity {
          }
       }
  
-
-
+      void cleanup() {
+         delete[] p;
+      }
 
 };
 
