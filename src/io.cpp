@@ -43,6 +43,12 @@ class EnergyDensity {
       }
 
 
+
+    int cleanup() {
+       delete[] energy_density;
+       return 0;
+    }
+
 };
 
 
