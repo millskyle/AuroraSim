@@ -17,8 +17,8 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = 1e5;
-      int tmax = 100000;
+      int N = 1e3;
+      int tmax = 100;
       int t = 0;
 
       /* box size, in km */
