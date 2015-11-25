@@ -284,9 +284,11 @@ debug_xyz.close();
 //report.respawns = sim.electrons[2].respawn_count;
 //report.write("output/report.log");
 
+energy_density.cleanup();
 
-
-
+photon_density.cleanup();
+E_field.cleanup();
+rho.cleanup();
 
 
 cout << "\n\n" << endl;
