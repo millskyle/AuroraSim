@@ -64,6 +64,7 @@ int main() {
          photon_density.write_image(t);
          photon_density.reset();
          energy_density.write_out(t);
+         energy_density.reset();
 
       }
 
@@ -125,8 +126,8 @@ int main() {
 
          //Check to see if electron will emit energy this timestep:
          if (e->emitting==1) {
-            e->E -= 100*sim.hc / e->emitting_wavelength;
-            energy_density.increment(voxelz,100*sim.hc / e->emitting_wavelength);
+            e->E -= sim.E_loss_factor*sim.hc / e->emitting_wavelength;
+            energy_density.increment(voxelz,sim.E_loss_factor*sim.hc / e->emitting_wavelength);
 //            e->random_collision();
 //            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
 //            if(e->ID==0) {

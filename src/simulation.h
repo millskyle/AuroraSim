@@ -32,6 +32,7 @@ class Simulation {
    
       /* Mean energy of electrons when they begin, in keV */
       float E_mean = 10.0;
+      float E_loss_factor = 100.0;
       
       float E_low_threshold = 10; 
       
