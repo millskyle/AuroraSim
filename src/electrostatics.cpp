@@ -7,6 +7,7 @@
 #include <fstream>
 #include <string.h>
 #include <fftw3.h>
+#include <thread>
 
 using namespace std;
 
@@ -28,7 +29,7 @@ class MagneticField {
 
 class ChargeDensity {
    public:
-      int resolution_x =128 ;
+      int resolution_x = 128 ;
       int resolution_y = 128 ;
       int resolution_z = 128 ;
 
@@ -60,6 +61,7 @@ class ElectricField {
 
    public:
       bool planned;
+      int fftw_threads_init() ;
       int Nx;
       int Ny;
       int Nz;
@@ -235,10 +237,17 @@ class ElectricField {
             }
          }
       }
+     
+      thread first(  fftw_execute, inverseX );
+      thread second(  fftw_execute, inverseY );
+      thread third(  fftw_execute, inverseZ );
+//      fftw_execute(inverseX);
+//      fftw_execute(inverseY);
+//      fftw_execute(inverseZ);
 
-      fftw_execute(inverseX);
-      fftw_execute(inverseY);
-      fftw_execute(inverseZ);
+      first.join();
+      second.join();
+      third.join();
 
       element=-1;
             for(int k=0; k< Nz; k++) {
