@@ -17,7 +17,7 @@ class Electron ;
 
 class Simulation {
    public: 
-      int N = pow(2,20) ;
+      int k = pow(2,20);  //number of particles will be N = 2^k 
       int tmax = 100;
       int t = 0;
 
@@ -59,10 +59,13 @@ class Simulation {
       float hc = 1.23984197 *10000; //*plank's constant in keV*nm 
 
 
-      void seed() {
-         for (int i=0; i<10000; i++) {
-            sheet_seeds.push_back((float)rand()/RAND_MAX) ; // = gen_random(100);
-         }
+      int N;
+
+      void init() {
+         N = pow(2,k);
+//         for (int i=0; i<10000; i++) {
+//            sheet_seeds.push_back((float)rand()/RAND_MAX) ; // = gen_random(100);
+//         }
 
       }
 
