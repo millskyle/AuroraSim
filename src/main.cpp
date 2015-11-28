@@ -268,7 +268,7 @@ int main() {
          
       }
 
-      if (t%1==0 ) { E_field.compute(); }
+      if (t%sim.E_field_recalc==0 ) { E_field.compute(); }
       rho.reset();
 
    }

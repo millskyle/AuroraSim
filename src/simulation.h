@@ -26,6 +26,8 @@ class Simulation {
       float box_sizey = 200.0; //.push_back(100.00);
       float box_sizez = 200.0; //push_back(200.00);
 
+      int E_field_recalc = 1;  //how many timesteps between E_field recalculations.
+
       vector<float> sheet_seeds;
 
       float dt=0.001;
