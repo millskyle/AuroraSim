@@ -17,7 +17,7 @@ class Electron ;
 
 class Simulation {
    public: 
-      int k = pow(2,20);  //number of particles will be N = 2^k 
+      int k = 20;  //number of particles will be N = 2^k 
       int tmax = 100;
       int t = 0;
 
@@ -27,8 +27,6 @@ class Simulation {
       float box_sizez = 200.0; //push_back(200.00);
 
       int E_field_recalc = 1;  //how many timesteps between E_field recalculations.
-
-      vector<float> sheet_seeds;
 
       float dt=0.001;
    

@@ -29,11 +29,20 @@ class MagneticField {
 
 class ChargeDensity {
    public:
-      int resolution_x = 128 ;
-      int resolution_y = 128 ;
-      int resolution_z = 128 ;
+      int resolution_x =128 ;
+      int resolution_y =128 ;
+      int resolution_z  = 128 ;
 
-      float *p = new float[resolution_x*resolution_y*resolution_z];
+      float *p = new float[resolution_x*resolution_y*resolution_z]; ;
+
+      int init(Simulation *simm) {
+         int k = simm->k; //2^k particles in the simulation
+         int kk = floor(k/3) + 1; 
+         resolution_x = int(pow(2,kk));
+         resolution_y = int(pow(2,kk));
+         resolution_z = int(pow(2,kk));
+         p = new float[resolution_x*resolution_y*resolution_z];
+      }
     
       int incr_element(int i, int j, int k) {
          p[i + resolution_x *( j + resolution_y * k) ] ++ ;

@@ -31,6 +31,7 @@ int main() {
 //   report.init();
    MagneticField mag_field;
    ChargeDensity rho;
+//   rho.init(&sim);
    ElectricField E_field;
    E_field.init(&sim, &rho);
    
@@ -68,16 +69,10 @@ int main() {
 
       }
 
+cout << sim.N << endl;
 
-   /*   if (t%5==0) { 
-          cout << "\r                                             " ;
-         cout << "t = " << t << "     ";
-          cout << endl;
-         cout.flush(); 
-      }
-      */
- 
       for (int i=0; i<sim.N ; i++) {
+
          Electron* e = &sim.electrons[i]; //make a pointer to the electron we're dealing with
            //if electron has left the cell, or has not enough energy remaining, we're done tracking it.
          //Reset it.
