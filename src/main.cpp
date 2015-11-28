@@ -22,7 +22,7 @@ int main() {
    srand ( time(NULL));
    vector<float> randoms;
    Simulation sim;
-   sim.seed(); //generate random numbers that will be the same throughout program execution
+   sim.init();
    PhotonDensity photon_density;
    photon_density.init(&sim);
    EnergyDensity energy_density;
