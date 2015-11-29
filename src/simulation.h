@@ -18,7 +18,7 @@ class Electron ;
 class Simulation {
    public: 
       int k = 20;  //number of particles will be N = 2^k 
-      int tmax = 100;
+      int tmax = 5000;
       int t = 0;
 
       /* box size, in km */
@@ -76,7 +76,7 @@ class Simulation {
          // dE/dx due to atmospheric 'drag'
          float effective_Z = 7.2; // 
          float Ionization = 92.0;
-         float coeff = 4*M_PI*number_density(h)*pow(e_chg,4)*effective_Z / (m_e * pow(v,2));
+         float coeff = 4*M_PI*number_density(h+100)*pow(e_chg,4)*effective_Z / (m_e * pow(v,2));
          float parenthesis= log(  2*pow(v,2) / (m_e*Ionization  )) - 1.2329;
          return coeff*parenthesis;
       }

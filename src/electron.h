@@ -28,6 +28,7 @@ public:
    bool emitting;
    float emitting_time_left;
    float emitting_wavelength;
+   int dead_counter;
    float Fx;
    float Fy;
    float Fz;
@@ -209,6 +210,7 @@ public:
       Fy = 0; 
       Fz = 0;
       respawn_count +=1;
+      dead_counter = 0;
 
    }
 

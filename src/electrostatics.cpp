@@ -15,7 +15,7 @@ class MagneticField {
    public:
       float strength = 1.0;
 
-      vector<float> at(float t,float x,float y,float z){
+      vector<float> at(int t,float x,float y,float z){
          vector<float> r;
 //         r.push_back((strength*sin(x-50)/(x-50)));
 //         r.push_back((strength*sin(x-50)/(x-50)));
