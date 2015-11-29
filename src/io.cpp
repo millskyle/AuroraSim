@@ -37,7 +37,10 @@ class EnergyDensity {
 
 
       int increment(int i, float n) {
-         energy_density[i]+=n;
+         if (i>=0 && i<resolution_z) {
+            energy_density[i]+=n;
+         } 
+         return 0;
       }
 
 

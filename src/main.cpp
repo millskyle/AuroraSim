@@ -82,9 +82,9 @@ cout << sim.N << endl;
          while (  
             e->z!=e->z //(that will evaluate true if e->z == nan) 
 
-            || e->x <= -(2*sim.box_sizex) || e->x >= (2*sim.box_sizex) 
-            || e->y <= -(2*sim.box_sizey) || e->y >= (2*sim.box_sizey) 
-            || e->z <= -(2*sim.box_sizez) || e->z >= (2*sim.box_sizez)
+            || e->x <= -(sim.box_sizex) || e->x >= (2*sim.box_sizex) 
+            || e->y <= -(sim.box_sizey) || e->y >= (2*sim.box_sizey) 
+            || e->z <= -(sim.box_sizez) || e->z >= (2*sim.box_sizez)
             || e->dead_counter > 100
             //|| e->E <= (sim.hc / e->sim->wavelength_red ) ) 
           ) {
@@ -129,7 +129,7 @@ cout << sim.N << endl;
          }
 
          //Check to see if electron will emit energy this timestep:
-         if (e->emitting==1) {
+         if (e->emitting==1 && e->dead_counter == 0) {
             e->E -= sim.E_loss_factor*sim.hc / e->emitting_wavelength;
             energy_density.increment(voxelz,sim.E_loss_factor*sim.hc / e->emitting_wavelength);
 //            e->random_collision();
@@ -256,12 +256,12 @@ cout << sim.N << endl;
 
 
 ///////////PERIODIC BOUNDARY CONDITIONS/////
-           while (e->x < 0) {e->x += sim.box_sizex;}
-           while (e->y < 0) {e->y += sim.box_sizey;}
-/*         while (e->z < 0) {e->z += sim.box_sizez;}
-           while (e->x > sim.box_sizex) {e->x -= sim.box_sizex;}
-           while (e->y > sim.box_sizey) {e->y -= sim.box_sizey;}
-           while (e->z > sim.box_sizez) {e->z -= sim.box_sizez;} */
+//           while (e->x < 0) {e->x += sim.box_sizex;}
+//           while (e->y < 0) {e->y += sim.box_sizey;}
+//           while (e->z < 0) {e->z += sim.box_sizez;}
+//           while (e->x > sim.box_sizex) {e->x -= sim.box_sizex;}
+//           while (e->y > sim.box_sizey) {e->y -= sim.box_sizey;}
+//           while (e->z > sim.box_sizez) {e->z -= sim.box_sizez;} */
 ///////////////////////////////////////////           
 
         

@@ -176,14 +176,6 @@ public:
 //      }
 //      x = 0.33 * (A * sin(n*M_PI*(y-hshift)/sim->box_sizex) + shift) + 0.333*sim->box_sizex;
 
-
-
-
-
-//      x = 3.0;
-//      y = 50.0;
-
-
       if (sim->t > 100) {
          z = sim->box_sizez + 10*(float)rand()/RAND_MAX;
       } else {
@@ -198,7 +190,7 @@ public:
  
       rnd = gen_random();
 
-      E = 100000*sim->E_mean * (abs(rnd)+1.0);
+      E = (100000-10*sim->t)*sim->E_mean * (abs(rnd)+1.0);
       vx = 0.00; //(0.001 * sqrt(2*E/sim->m_e) * randoms[1]);
       vy = 0.00; //-(0.001 * sqrt(2*E/sim->m_e) * randoms[2]);
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
