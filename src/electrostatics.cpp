@@ -29,9 +29,9 @@ class MagneticField {
 
 class ChargeDensity {
    public:
-      int resolution_x =128 ;
-      int resolution_y =128 ;
-      int resolution_z  = 128 ;
+      int resolution_x = 128 ;
+      int resolution_y = 128 ;
+      int resolution_z = 128 ;
 
       float *p = new float[resolution_x*resolution_y*resolution_z]; ;
 
@@ -282,7 +282,13 @@ rho_out.close();
 
          
 void cleanup() {
- 
+
+
+         fftw_destroy_plan(forward);
+         fftw_destroy_plan( inverseX);
+         fftw_destroy_plan(inverseY);
+         fftw_destroy_plan(inverseZ);
+
          delete[] Ex;
          delete[] Ey;
          delete[] Ez;

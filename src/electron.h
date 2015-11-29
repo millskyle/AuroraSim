@@ -90,16 +90,13 @@ public:
    float calculate_probabilities(float h) {
         p_emit_r = get_p_emit_red(h);
         p_emit_g = get_p_emit_green(h);
-        p_emit_b = get_p_emit_blue(h)/2.0;
+        p_emit_b = get_p_emit_blue(h)*0.5;
         p_emit = p_emit_r + p_emit_g + p_emit_b ;
         p_emit_r = p_emit_r / p_emit;
         p_emit_g = p_emit_g / p_emit;
         p_emit_b = p_emit_b / p_emit;
         //cout << h<<"   "   << p_emit_r << "  " << p_emit_g << "  " << p_emit_b << "  "    << p_emit << endl;
 
-   }
-   float get_p_interaction(float h) {
-      return 0.001 * exp(-6*h/sim->box_sizez)*(get_p_emit_red(h) + get_p_emit_green(h) +  get_p_emit_blue(h)) ;
    }
 
    //times that each emission should be active for  
@@ -130,8 +127,8 @@ public:
       //rescales the velocities to be consistent with the current kinetic energy
 //      cout << "BEFORE: " << vx << "  " << vy << "  " << vz << endl;
       float R = 0.5*sim->m_e*(vx*vx + vy*vy + vz*vz) / E;
-      vx = vx/sqrt(R);
-      vy = vy/sqrt(R);
+      //vx = vx/sqrt(R);
+      //vy = vy/sqrt(R);
       vz = vz/sqrt(R);
 //      cout << "BEFORE: " << vx << "  " << vy << "  " << vz << endl;
 //      cout << " " << endl;
@@ -157,24 +154,6 @@ public:
       
       y = 0.6 * sim->box_sizey* (float)rand() / RAND_MAX + 0.2*sim->box_sizey;
       x = 0.6 * sim->box_sizex* (float)rand() / RAND_MAX + 0.2*sim->box_sizex;
-//      y = sim->box_sizey* (float)rand() / RAND_MAX;
-//      x = sim->box_sizex* (float)rand() / RAND_MAX;
-
-//      x = 100.0;
-//      y = 100.0;
-
-//      if ((float)rand()/RAND_MAX > 0.4) {
-//         A = sim->box_sizex/2.0 - 1.0;
-//         shift = sim->box_sizex/2.0;
-//         n = 6.0;
-//         hshift = sim->t/3000.0;
-//      } else {
-//         A = sim->box_sizex/2.0 - 1.0;
-//         shift = sim->box_sizex/2.0;
-//         n = 4.23455;
-//         hshift = -sim->t / 1000.00;
-//      }
-//      x = 0.33 * (A * sin(n*M_PI*(y-hshift)/sim->box_sizex) + shift) + 0.333*sim->box_sizex;
 
       if (sim->t > 100) {
          z = sim->box_sizez + 10*(float)rand()/RAND_MAX;
@@ -190,9 +169,9 @@ public:
  
       rnd = gen_random();
 
-      E = (100000-10*sim->t)*sim->E_mean * (abs(rnd)+1.0);
-      vx = 0.00; //(0.001 * sqrt(2*E/sim->m_e) * randoms[1]);
-      vy = 0.00; //-(0.001 * sqrt(2*E/sim->m_e) * randoms[2]);
+      E = (100000)*sim->E_mean * (abs(rnd)+1.0);
+      vx = (0.001 * sqrt(2*E/sim->m_e) * (float)rand()/RAND_MAX );
+      vy = (0.001 * sqrt(2*E/sim->m_e) * (float)rand()/RAND_MAX );
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
       vz = -(sqrt( 2*E / sim->m_e - tmp )) ;
       emitting = 0;
@@ -203,7 +182,6 @@ public:
       Fz = 0;
       respawn_count +=1;
       dead_counter = 0;
-
    }
 
 

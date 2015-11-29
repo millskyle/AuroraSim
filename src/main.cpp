@@ -82,10 +82,10 @@ cout << sim.N << endl;
          while (  
             e->z!=e->z //(that will evaluate true if e->z == nan) 
 
-            || e->x <= -(sim.box_sizex) || e->x >= (2*sim.box_sizex) 
-            || e->y <= -(sim.box_sizey) || e->y >= (2*sim.box_sizey) 
-            || e->z <= -(sim.box_sizez) || e->z >= (2*sim.box_sizez)
-            || e->dead_counter > 100
+//            || e->x <= -(sim.box_sizex) || e->x >= (2*sim.box_sizex) 
+//            || e->y <= -(sim.box_sizey) || e->y >= (2*sim.box_sizey) 
+            || e->z < 0 || e->z >= 1.05*(sim.box_sizez)
+//            || e->dead_counter > 100
             //|| e->E <= (sim.hc / e->sim->wavelength_red ) ) 
           ) {
             e->reset();
@@ -151,21 +151,23 @@ cout << sim.N << endl;
 //                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126) ;
 //                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.2126) ;
 //                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2126) ;
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.9*1.0) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.3*1.0) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.9*79.0/255.0) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.8) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.16) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.4) ;
             } else if (e->emitting_wavelength == sim.wavelength_green ) {
 //                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.7152) ;
 //                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
 //                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.7152) ;
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.9*189.0/255.0) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.9) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.18) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.69) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.4) ;
             } else if (e->emitting_wavelength == sim.wavelength_blue ) {
 //                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.0722) ;
 //                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.0722) ;
 //                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.9*70./255.) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,1.8) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.4) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.4) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2) ;
             }
 
         }
@@ -178,7 +180,7 @@ cout << sim.N << endl;
          }
 
 
-        e->rescale_velocities();
+//        e->rescale_velocities();
        
         voxelx = int((float)rho.resolution_x / (float)sim.box_sizex * e->x); 
         voxely = int((float)rho.resolution_y / (float)sim.box_sizey * e->y);
@@ -242,10 +244,17 @@ cout << sim.N << endl;
          e->vz += 0.5 * (e->Fz / sim.m_e) * sim.dt ;
 
         //Bethe energy loss -dE/dx 
-//        tmpfloat = sim.bethe_energy_loss(e->z, sqrt(e->vx*e->vx + e->vy*e->vy + e->vz*e->vx))*e->vz * sim.dt ;
+//        tmpfloat = sim.bethe_energy_loss(e->z, sqrt(e->vx*e->vx + e->vy*e->vy + e->vz*e->vx)) ;
 //        e->E -= tmpfloat;
-///        cout << "Bethe Loss: " << tmpfloat << endl;
+////        cout << "Bethe Loss: " << tmpfloat << endl;
 //        energy_density.increment(Evoxelz,sim.E_loss_factor*sim.hc / e->emitting_wavelength);
+//        if (e->vz < 0) {
+//           e->vz += sqrt(2*tmpfloat/sim.m_e);
+//        } else {
+//           e->vz -= sqrt(2*tmpfloat/sim.m_e);
+//        }
+//
+
 
 
 
@@ -256,18 +265,18 @@ cout << sim.N << endl;
 
 
 ///////////PERIODIC BOUNDARY CONDITIONS/////
-//           while (e->x < 0) {e->x += sim.box_sizex;}
-//           while (e->y < 0) {e->y += sim.box_sizey;}
-//           while (e->z < 0) {e->z += sim.box_sizez;}
-//           while (e->x > sim.box_sizex) {e->x -= sim.box_sizex;}
-//           while (e->y > sim.box_sizey) {e->y -= sim.box_sizey;}
-//           while (e->z > sim.box_sizez) {e->z -= sim.box_sizez;} */
+           while (e->x < 0) {e->x += sim.box_sizex;}
+           while (e->y < 0) {e->y += sim.box_sizey;}
+//         while (e->z < 0) {e->z += sim.box_sizez;}
+           while (e->x > sim.box_sizex) {e->x -= sim.box_sizex;}
+           while (e->y > sim.box_sizey) {e->y -= sim.box_sizey;}
+//         while (e->z > sim.box_sizez) {e->z -= sim.box_sizez;} */
 ///////////////////////////////////////////           
 
         
          if (e->ID==3) cout << t << "\t" << e->x << "\t" << e->y << "\t" << e->z 
                             << "\tE: " << e->E <<  "\t"  << e->Fx << "\t" << e->Fy << "\t" << e->Fz 
-                            << "\t" << e->vx << "\t" << e->vy << "\t" << e->vz <<  "\n" ;
+                            << "\t" << e->vx << "\t" << e->vy << "\t" << e->vz <<  "Bethe: " << tmpfloat <<  "\n" ;
 
          
          

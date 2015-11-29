@@ -17,7 +17,7 @@ class Electron ;
 
 class Simulation {
    public: 
-      int k = 20;  //number of particles will be N = 2^k 
+      int k = 21;  //number of particles will be N = 2^k 
       int tmax = 5000;
       int t = 0;
 
@@ -41,8 +41,8 @@ class Simulation {
 //      int timescale_blue_emission = 2.;// 0.001/dt;
       
       int timescale_red_emission = 500.; //110/dt;
-      int timescale_green_emission = 50.;// 0.7/dt;
-      int timescale_blue_emission = 5.;// 0.001/dt;
+      int timescale_green_emission = 100.;// 0.7/dt;
+      int timescale_blue_emission = 50.;// 0.001/dt;
 
 
       float wavelength_red = 500.0;
@@ -73,6 +73,7 @@ class Simulation {
 
 
       float bethe_energy_loss(float h,float v) {
+         return 1e13/pow((h+190.0),4);
          // dE/dx due to atmospheric 'drag'
          float effective_Z = 7.2; // 
          float Ionization = 92.0;
