@@ -7,7 +7,7 @@ import sys
 import cv2
 import re
 
-
+brightness = sys.argv[1]
 
 
 
@@ -26,6 +26,7 @@ def convert_to_image(dat):
          plt.figure(figsize=(w/20,h/20))
 
          y = np.reshape(x, (h,w,3)) * 255
+         y = y*float(brightness)
 
          plt.imshow(y,origin='lower',extent=(0,w,0,h))
          plt.savefig("output_{0}.png".format(number.zfill(8)))
