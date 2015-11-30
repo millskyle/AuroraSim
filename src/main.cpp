@@ -18,7 +18,6 @@
 using namespace std;
 
 
-
 int main() {
    srand ( time(NULL));
    vector<float> randoms;
@@ -40,6 +39,9 @@ int main() {
    int Evoxelx,Evoxely,Evoxelz;
 
    vector<float> B;
+   float Bx = 0;
+   float By = 2.0;
+   float Bz = 0.0;
    float tmpfloat;
 
 
@@ -148,26 +150,17 @@ cout << sim.N << endl;
  
 
             if (e->emitting_wavelength == sim.wavelength_red ) {
-//                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126) ;
-//                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.2126) ;
-//                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2126) ;
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.8) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.16) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.4) ;
+//                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.0) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,70.0/255.0) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,1.0) ;
             } else if (e->emitting_wavelength == sim.wavelength_green ) {
-//                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.7152) ;
-//                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
-//                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.7152) ;
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.18) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.69) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.4) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,204./255.) ;
+                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,61./255.) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,204./255.) ;
             } else if (e->emitting_wavelength == sim.wavelength_blue ) {
-//                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.0722) ;
-//                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.0722) ;
-//                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.4) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.4) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2) ;
+                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,97./255) ;
+//                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,) ;
+                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,97./255.) ;
             }
 
         }
@@ -267,7 +260,7 @@ cout << sim.N << endl;
 ///////////PERIODIC BOUNDARY CONDITIONS/////
            while (e->x < 0) {e->x += sim.box_sizex;}
            while (e->y < 0) {e->y += sim.box_sizey;}
-//         while (e->z < 0) {e->z += sim.box_sizez;}
+//           while (e->z < 0) {e->z += sim.box_sizez;}
            while (e->x > sim.box_sizex) {e->x -= sim.box_sizex;}
            while (e->y > sim.box_sizey) {e->y -= sim.box_sizey;}
 //         while (e->z > sim.box_sizez) {e->z -= sim.box_sizez;} */

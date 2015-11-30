@@ -43,54 +43,50 @@ public:
    float p_emit_b=0;
 
     
-   float get_p_emit_red(float x) {
-
-     
-     return 
-      1.97692801419e-17 * pow(x, 8 ) + 
-     -1.24675920355e-14 * pow(x, 7 ) + 
-     2.61694799395e-12 * pow(x, 6 ) + 
-     -1.20009942187e-10 * pow(x, 5 ) + 
-     -3.03037545164e-08 * pow(x, 4 ) + 
-     4.58332800758e-06 * pow(x, 3 ) + 
-     -0.000224277684039 * pow(x, 2 ) + 
-     0.00397540318554 * pow(x, 1 ) + 
-     -0.00815824073091 * pow(x, 0 ) ;
-   }
-
-   
-   float get_p_emit_green(float x) {
-     return 1.22309846233e-16 * pow(x, 8 ) + 
-     -1.04247753054e-13 * pow(x, 7 ) + 
-     3.62402159771e-11 * pow(x, 6 ) + 
-     -6.54860670058e-09 * pow(x, 5 ) + 
-     6.39054458804e-07 * pow(x, 4 ) + 
-     -2.94617910697e-05 * pow(x, 3 ) + 
-     0.000107184265124 * pow(x, 2 ) + 
-     0.0318371583695 * pow(x, 1 ) + 
-     0.0028840983908 * pow(x, 0 ) ;
-   }
-
-   
    float get_p_emit_blue(float x) {
-      return 
-         7.71746456929e-17 * pow(x, 8 ) + 
-        -6.74045102078e-14 * pow(x, 7 ) + 
-        2.40765868528e-11 * pow(x, 6 ) + 
-        -4.49364430269e-09 * pow(x, 5 ) + 
-        4.59098779432e-07 * pow(x, 4 ) + 
-        -2.34482985981e-05 * pow(x, 3 ) + 
-        0.000317362998942 * pow(x, 2 ) + 
-        0.0130756074812 * pow(x, 1 ) + 
-        0.00402470459253 * pow(x, 0 );
+return 4.81871384251e-17 * pow(x, 8 ) + 
+-5.14246386909e-14 * pow(x, 7 ) + 
+2.14910606454e-11 * pow(x, 6 ) + 
+-4.54662002061e-09 * pow(x, 5 ) + 
+5.20401501824e-07 * pow(x, 4 ) + 
+-3.18407383944e-05 * pow(x, 3 ) + 
+0.000985761182095 * pow(x, 2 ) + 
+-0.0133320014768 * pow(x, 1 ) + 
+0.0612772920524 * pow(x, 0 ) ;
+     
+  }
+
   
+   float get_p_emit_green(float x) {
+return 3.81278117806e-16 * pow(x, 8 ) + 
+-3.10001714635e-13 * pow(x, 7 ) + 
+1.02888787226e-10 * pow(x, 6 ) + 
+-1.78415951306e-08 * pow(x, 5 ) + 
+1.71129354466e-06 * pow(x, 4 ) + 
+-8.80251099314e-05 * pow(x, 3 ) + 
+0.00219479356264 * pow(x, 2 ) + 
+-0.0294122754696 * pow(x, 1 ) + 
+0.666529089285 * pow(x, 0 );
+}
+   
+   float get_p_emit_red(float x) {
+      return 
+ -1.11444871653e-15 * pow(x, 8 ) + 
+8.60576875019e-13 * pow(x, 7 ) + 
+-2.68171320654e-10 * pow(x, 6 ) + 
+4.29637206481e-08 * pow(x, 5 ) + 
+-3.71855716986e-06 * pow(x, 4 ) + 
+0.000166259525058 * pow(x, 3 ) + 
+-0.00332817581428 * pow(x, 2 ) + 
+0.0249578808359 * pow(x, 1 ) + 
+0.0359694822408 * pow(x, 0 ); 
    }
 
 
    float calculate_probabilities(float h) {
         p_emit_r = get_p_emit_red(h);
         p_emit_g = get_p_emit_green(h);
-        p_emit_b = get_p_emit_blue(h)*0.5;
+        p_emit_b = get_p_emit_blue(h);
         p_emit = p_emit_r + p_emit_g + p_emit_b ;
         p_emit_r = p_emit_r / p_emit;
         p_emit_g = p_emit_g / p_emit;
@@ -169,7 +165,7 @@ public:
  
       rnd = gen_random();
 
-      E = (100000)*sim->E_mean * (abs(rnd)+1.0);
+      E = (1000000)*sim->E_mean * (abs(rnd)+1.0);
       vx = (0.001 * sqrt(2*E/sim->m_e) * (float)rand()/RAND_MAX );
       vy = (0.001 * sqrt(2*E/sim->m_e) * (float)rand()/RAND_MAX );
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity

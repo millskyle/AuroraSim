@@ -17,8 +17,8 @@ class Electron ;
 
 class Simulation {
    public: 
-      int k = 21;  //number of particles will be N = 2^k 
-      int tmax = 5000;
+      int k = 19;  //number of particles will be N = 2^k 
+      int tmax = 50000;
       int t = 0;
 
       /* box size, in km */
@@ -26,7 +26,7 @@ class Simulation {
       float box_sizey = 200.0; //.push_back(100.00);
       float box_sizez = 200.0; //push_back(200.00);
 
-      int E_field_recalc = 1;  //how many timesteps between E_field recalculations.
+      int E_field_recalc = 5;  //how many timesteps between E_field recalculations.
 
       float dt=0.001;
    
@@ -45,9 +45,9 @@ class Simulation {
       int timescale_blue_emission = 50.;// 0.001/dt;
 
 
-      float wavelength_red = 500.0;
-      float wavelength_green = 600.0;
-      float wavelength_blue = 800.0;
+      float wavelength_red = 450.0;
+      float wavelength_green = 300.0;
+      float wavelength_blue = 260.0;
       float e_chg = 1e3; // elementary charge
       float epsilon_naught = 1e-9;
       
