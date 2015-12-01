@@ -91,7 +91,7 @@ public:
         p_emit_r = get_p_emit_red(h);
         p_emit_g = get_p_emit_green(h);
         p_emit_b = get_p_emit_blue(h)*0.5;
-        p_emit = p_emit_r + p_emit_g + p_emit_b ;
+        p_emit = (p_emit_r + p_emit_g + p_emit_b)*exp((h - sim->box_sizez)/50) ;
         p_emit_r = p_emit_r / p_emit;
         p_emit_g = p_emit_g / p_emit;
         p_emit_b = p_emit_b / p_emit;
