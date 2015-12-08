@@ -9,6 +9,7 @@
 #include <stdio.h>      /* printf, NULL */
 #include <stdlib.h>     /* srand, rand */
 
+//my own stuff
 #include "utility_functions.h"
 #include "simulation.h"
 #include "electrostatics.cpp"
@@ -16,7 +17,6 @@
 #include "electron.h"
 
 using namespace std;
-
 
 
 int main() {
@@ -28,18 +28,17 @@ int main() {
    photon_density.init(&sim);
    EnergyDensity energy_density;
    energy_density.init(photon_density.resolution_z);
-//   OutputReport report;
-//   report.init();
    MagneticField mag_field;
    ChargeDensity rho;
-//   rho.init(&sim);
    ElectricField E_field;
    E_field.init(&sim, &rho);
    
    int voxelx,voxely,voxelz;
    int Evoxelx,Evoxely,Evoxelz;
-
    vector<float> B;
+   float By=-1.0;
+   float Bx=0.0;
+   float Bz=0.0;
    float tmpfloat;
 
 
@@ -54,8 +53,6 @@ int main() {
    cout << "Electron objects created" << endl;
  
    ofstream debug_xyz;
-  // debug_xyz.open("out.xyz");
-
 
    float rnd;
    float p_interaction = 0.1;
@@ -77,25 +74,20 @@ cout << sim.N << endl;
       for (int i=0; i<sim.N ; i++) {
 
          Electron* e = &sim.electrons[i]; //make a pointer to the electron we're dealing with
-           //if electron has left the cell, or has not enough energy remaining, we're done tracking it.
+         
+         //if electron has left the cell, or has not enough energy remaining, we're done tracking it.
          //Reset it.
          while (  
             e->z!=e->z //(that will evaluate true if e->z == nan) 
-
-//            || e->x <= -(sim.box_sizex) || e->x >= (2*sim.box_sizex) 
-//            || e->y <= -(sim.box_sizey) || e->y >= (2*sim.box_sizey) 
-            || e->z < 0 || e->z >= 1.05*(sim.box_sizez)
-//            || e->dead_counter > 100
-            //|| e->E <= (sim.hc / e->sim->wavelength_red ) ) 
+            || e->z < 0 
+            || e->z >= 1.05*(sim.box_sizez)
+            || e->E <= (sim.hc / e->sim->wavelength_red )  
           ) {
             e->reset();
             e->t = t;
          }
 
-         if (e->E <= (sim.hc / e->sim->wavelength_red ) ){
-            e->dead_counter ++;
-         }
-        
+          
          voxelx = int((float)photon_density.resolution_x / (float)sim.box_sizex * e->x);
          voxely = int((float)photon_density.resolution_y / (float)sim.box_sizey * e->y);
          voxelz = int((float)photon_density.resolution_z / (float)sim.box_sizez * e->z);
@@ -132,47 +124,31 @@ cout << sim.N << endl;
          if (e->emitting==1 && e->dead_counter == 0) {
             e->E -= sim.E_loss_factor*sim.hc / e->emitting_wavelength;
             energy_density.increment(voxelz,sim.E_loss_factor*sim.hc / e->emitting_wavelength);
-//            e->random_collision();
-//            cout << sim.hplanck * sim.clight / e->emitting_wavelength<< endl;
-//            if(e->ID==0) {
-//               report.EvsT.push_back(e->E);
-//              }
             e->emitting_time_left -= 1;
             
-        if ( e->z < sim.box_sizez
-          && e->z >=0
-          && e->x >= 0 
-          && e->x <= sim.box_sizex
-          && e->y >= 0
-          && e->y <= sim.box_sizey    ) {
- 
+            if (  e->z < sim.box_sizez
+                  && e->z >=0
+                  && e->x >= 0 
+                  && e->x <= sim.box_sizex
+                  && e->y >= 0
+                  && e->y <= sim.box_sizey    ) {
 
-            if (e->emitting_wavelength == sim.wavelength_red ) {
-//                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.2126) ;
-//                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.2126) ;
-//                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2126) ;
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.8) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.16) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.4) ;
-            } else if (e->emitting_wavelength == sim.wavelength_green ) {
-//                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.7152) ;
-//                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.7152) ;
-//                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.7152) ;
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.18) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.69) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.4) ;
-            } else if (e->emitting_wavelength == sim.wavelength_blue ) {
-//                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.0722) ;
-//                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.0722) ;
-//                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.0722) ;
-                photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.4) ;
-                photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.4) ;
-                photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2) ;
+               if (e->emitting_wavelength == sim.wavelength_red ) {
+                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.8) ;
+                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.16) ;
+                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.4) ;
+               } else if (e->emitting_wavelength == sim.wavelength_green ) {
+                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.18) ;
+                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.69) ;
+                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.4) ;
+               } else if (e->emitting_wavelength == sim.wavelength_blue ) {
+                  photon_density.incr_element(photon_density.R, voxelx,voxely,voxelz,0.4) ;
+                  photon_density.incr_element(photon_density.G, voxelx,voxely,voxelz,0.4) ;
+                  photon_density.incr_element(photon_density.B, voxelx,voxely,voxelz,0.2) ;
+               }
+
             }
 
-        }
-
-            
             if (e->emitting_time_left < 1) { //if it's done emitting
                e->emitting = 0;
                e->emitting_wavelength = 0;
@@ -180,127 +156,116 @@ cout << sim.N << endl;
          }
 
 
-//        e->rescale_velocities();
-       
+//CHARGE DENSITY CALCULATION///////////////////////////////
         voxelx = int((float)rho.resolution_x / (float)sim.box_sizex * e->x); 
         voxely = int((float)rho.resolution_y / (float)sim.box_sizey * e->y);
         voxelz = int((float)rho.resolution_z / (float)sim.box_sizez * e->z);
-       
         if (
              voxelx >= 0 
           && voxelx<rho.resolution_x 
           && voxely >= 0 
           && voxely<rho.resolution_y 
           && voxelz >= 0 
-          && voxelz<rho.resolution_z) {
-        
-        rho.incr_element(voxelx,voxely,voxelz);  
-        
+          && voxelz<rho.resolution_z) 
+        {
+            rho.incr_element(voxelx,voxely,voxelz);  
         }
+///////////////////////////////////////
+
          
-
-
-         //add any applicable forces to e->Fx, e->Fy, e->Fz :
-
+         
+//FORCES////////////////////////
          e->Fx = 0;
          e->Fy = 0;
          e->Fz = 0;
-         //rescale the velocities according to the new energy
-
-//         randoms = gen_random(3);
-
-//         B = mag_field.at(t,e->x,e->y,e->z);
-
-
-//         e->Fx += (e->vy * B[2] - e->vz * B[1]) / 1e-1 ;
-//         e->Fy += (e->vz * B[0] - e->vx * B[2]) /1e-1;
-//         e->Fz += (e->vx * B[1] - e->vy * B[0]) /1e-1 ;
- 
-         
-
+         //magnetic force F = v x B
+         e->Fx += (e->vy * Bz - e->vz * By) / 1e-1 ;
+         e->Fy += (e->vz * Bx - e->vx * Bz) / 1e-1;
+         e->Fz += (e->vx * By - e->vy * Bx) / 1e-1 ;
+         //electric force F = q E
          e->Fx += 1.0e12/sim.N*(sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz));
          e->Fy += 1.0e12/sim.N*(sim.e_chg * E_field.get_element(E_field.Ey,voxelx,voxely,voxelz));
          e->Fz += 1.0e12/sim.N*(sim.e_chg * E_field.get_element(E_field.Ez,voxelx,voxely,voxelz));
-
- //        e->Fx = 0;
- //        e-> Fy = 0;
- //        e->Fz = 0;
-
-
-/*         if ( e->ID == 4 ) {
-            cout << "x=" << e->x << "    ey="<<e->y<<"      ez="<<e->z << endl;
-            cout << "F_Ex=" <<E_field.get_element(E_field.Ex,voxelx,voxely,voxelz) << endl;
-            cout << "F_Bx=" << (e->vy * B[2] - e->vz * B[1]) / 100. << endl;
-         }
-*/
-         //cout << "F_Ex=" << (sim.e_chg * E_field.get_element(E_field.Ex,voxelx,voxely,voxelz)) << endl;
+////////////////////////////////
          
+
+//INTEGRATION////////////////////////////////////
          //Perform equation of motion integration:
-
-         
-
-         e->vx += 0.5 * (e->Fx / sim.m_e) * sim.dt ;
-         e->vy += 0.5 * (e->Fy / sim.m_e) * sim.dt ;
-         e->vz += 0.5 * (e->Fz / sim.m_e) * sim.dt ;
-
-        //Bethe energy loss -dE/dx 
-//        tmpfloat = sim.bethe_energy_loss(e->z, sqrt(e->vx*e->vx + e->vy*e->vy + e->vz*e->vx)) ;
-//        e->E -= tmpfloat;
-////        cout << "Bethe Loss: " << tmpfloat << endl;
-//        energy_density.increment(Evoxelz,sim.E_loss_factor*sim.hc / e->emitting_wavelength);
-//        if (e->vz < 0) {
-//           e->vz += sqrt(2*tmpfloat/sim.m_e);
-//        } else {
-//           e->vz -= sqrt(2*tmpfloat/sim.m_e);
-//        }
-//
-
-
-
+         e->vx +=  (e->Fx / sim.m_e) * sim.dt ;
+         e->vy +=  (e->Fy / sim.m_e) * sim.dt ;
+         e->vz +=  (e->Fz / sim.m_e) * sim.dt ;
 
          e->x += e->vx * sim.dt;
          e->y += e->vy * sim.dt;
          e->z += e->vz * sim.dt;
+//////////////////////////////////////////////////
          
 
 
 ///////////PERIODIC BOUNDARY CONDITIONS/////
            while (e->x < 0) {e->x += sim.box_sizex;}
            while (e->y < 0) {e->y += sim.box_sizey;}
-//         while (e->z < 0) {e->z += sim.box_sizez;}
            while (e->x > sim.box_sizex) {e->x -= sim.box_sizex;}
            while (e->y > sim.box_sizey) {e->y -= sim.box_sizey;}
-//         while (e->z > sim.box_sizez) {e->z -= sim.box_sizez;} */
 ///////////////////////////////////////////           
 
-        
-         if (e->ID==3) cout << t << "\t" << e->x << "\t" << e->y << "\t" << e->z 
-                            << "\tE: " << e->E <<  "\t"  << e->Fx << "\t" << e->Fy << "\t" << e->Fz 
-                            << "\t" << e->vx << "\t" << e->vy << "\t" << e->vz <<  "Bethe: " << tmpfloat <<  "\n" ;
 
+//print out a bunch of info for one of the particles so we can see how simulation is progressing 
+         if (e->ID==3) { 
+            cout << t 
+                 << "\t" 
+                 << e->x 
+                 << "\t" 
+                 << e->y 
+                 << "\t" 
+                 << e->z 
+                 << "\tE: " 
+                 << e->E 
+                 <<  "\t"  
+                 << e->Fx 
+                 << "\t" 
+                 << e->Fy 
+                 << "\t" 
+                 << e->Fz 
+                 << "\t" 
+                 << e->vx 
+                 << "\t" 
+                 << e->vy 
+                 << "\t" 
+                 << e->vz 
+                 << "\n" ;
+         }
          
-         
+      } // end of loop over electrons
+
+      //recompute the electric field
+      if (t%sim.E_field_recalc==0 ) {
+         E_field.compute();
       }
+      rho.reset(); //zero out the charge density for next time
 
-      if (t%sim.E_field_recalc==0 ) { E_field.compute(); }
-      rho.reset();
 
-   }
-
+   } //end of loop over time
+   
    cout << endl;
 
-photon_density.write_image(t);
+   cout << "\nCLEANING UP" << endl;
 
+   energy_density.cleanup();
+   photon_density.cleanup();
+   E_field.cleanup();
+   rho.cleanup();
 
-debug_xyz.close();
+   cout << "\n\n" << endl;
 
+   return 0;
 
-energy_density.cleanup();
-photon_density.cleanup();
-E_field.cleanup();
-rho.cleanup();
-
-cout << "\n\n" << endl;
-
-return 0;
 }
+
+
+
+
+
+
+
+
