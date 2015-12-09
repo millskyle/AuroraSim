@@ -1,7 +1,6 @@
 #ifndef ELECTRON
 #define ELECTRON
 
-
 #include <vector> 
 #include <math.h>
 #include "utility_functions.h" 
@@ -11,7 +10,6 @@
 using namespace std;
 
 typedef vector<float> threevector;
-
 
 class Electron {
 public:
@@ -42,35 +40,31 @@ public:
    float p_emit_g=0;
    float p_emit_b=0;
 
-    
-   float get_p_emit_red(float x) {
-
-     
-     return 
-      1.97692801419e-17 * pow(x, 8 ) + 
-     -1.24675920355e-14 * pow(x, 7 ) + 
-     2.61694799395e-12 * pow(x, 6 ) + 
-     -1.20009942187e-10 * pow(x, 5 ) + 
-     -3.03037545164e-08 * pow(x, 4 ) + 
-     4.58332800758e-06 * pow(x, 3 ) + 
-     -0.000224277684039 * pow(x, 2 ) + 
-     0.00397540318554 * pow(x, 1 ) + 
-     -0.00815824073091 * pow(x, 0 ) ;
+   //polynomial fits of emission rates
+   float get_p_emit_red(float x) {  
+      return 
+         1.97692801419e-17 * pow(x, 8 ) + 
+         -1.24675920355e-14 * pow(x, 7 ) + 
+         2.61694799395e-12 * pow(x, 6 ) + 
+        -1.20009942187e-10 * pow(x, 5 ) + 
+        -3.03037545164e-08 * pow(x, 4 ) + 
+        4.58332800758e-06 * pow(x, 3 ) + 
+        -0.000224277684039 * pow(x, 2 ) + 
+        0.00397540318554 * pow(x, 1 ) + 
+       -0.00815824073091 * pow(x, 0 ) ;
    }
 
-   
    float get_p_emit_green(float x) {
-     return 1.22309846233e-16 * pow(x, 8 ) + 
-     -1.04247753054e-13 * pow(x, 7 ) + 
-     3.62402159771e-11 * pow(x, 6 ) + 
-     -6.54860670058e-09 * pow(x, 5 ) + 
-     6.39054458804e-07 * pow(x, 4 ) + 
-     -2.94617910697e-05 * pow(x, 3 ) + 
-     0.000107184265124 * pow(x, 2 ) + 
-     0.0318371583695 * pow(x, 1 ) + 
-     0.0028840983908 * pow(x, 0 ) ;
+      return 1.22309846233e-16 * pow(x, 8 ) + 
+         -1.04247753054e-13 * pow(x, 7 ) + 
+         3.62402159771e-11 * pow(x, 6 ) + 
+         -6.54860670058e-09 * pow(x, 5 ) + 
+         6.39054458804e-07 * pow(x, 4 ) + 
+         -2.94617910697e-05 * pow(x, 3 ) + 
+         0.000107184265124 * pow(x, 2 ) + 
+         0.0318371583695 * pow(x, 1 ) + 
+         0.0028840983908 * pow(x, 0 ) ;
    }
-
    
    float get_p_emit_blue(float x) {
       return 
@@ -86,7 +80,6 @@ public:
   
    }
 
-
    float calculate_probabilities(float h) {
         p_emit_r = get_p_emit_red(h);
         p_emit_g = get_p_emit_green(h);
@@ -95,78 +88,51 @@ public:
         p_emit_r = p_emit_r / p_emit;
         p_emit_g = p_emit_g / p_emit;
         p_emit_b = p_emit_b / p_emit;
-        //cout << h<<"   "   << p_emit_r << "  " << p_emit_g << "  " << p_emit_b << "  "    << p_emit << endl;
-
    }
 
-   //times that each emission should be active for  
+   //times for which each emission should be active  
    float get_t_emit_red() {
       float rnd = gen_random();
       return (rnd+1) * sim->timescale_red_emission;
    }
+
    float get_t_emit_green() {
       float rnd = gen_random();
       return (rnd+1) * sim->timescale_green_emission;
    }
+
    float get_t_emit_blue() {
       float rnd = gen_random();
       return (rnd+1) * sim->timescale_blue_emission;
    }
 
    int random_collision() {
-      float rnd = gen_random();
-
-
-      float theta = 2*M_PI*abs(rnd);
-      vx = vx * cos(theta);
-      vy = vy * sin(theta);
-      vz = -sqrt( 2*E / sim->m_e - (vx*vx + vy*vy) );
+      //TO-DO: incorporate scattering here
+      return 0;
     }
 
    int rescale_velocities() {
       //rescales the velocities to be consistent with the current kinetic energy
-//      cout << "BEFORE: " << vx << "  " << vy << "  " << vz << endl;
       float R = 0.5*sim->m_e*(vx*vx + vy*vy + vz*vz) / E;
-      //vx = vx/sqrt(R);
-      //vy = vy/sqrt(R);
       vz = vz/sqrt(R);
-//      cout << "BEFORE: " << vx << "  " << vy << "  " << vz << endl;
-//      cout << " " << endl;
-      
-
+      return 0; 
    }
 
-   float A;
-   float shift;
-   float n;
-   float hshift;
-
+   
    int reset() {
-      
-      
-      if (ID==3) {
-         cout << "Respawning" << endl;
-         cout << "  at respawn: Fx=" << Fx << "   Fy=" << Fy << "   Fz="<<Fz << endl;
-         cout << "  at respawn:  x=" <<  x << "    y=" <<  y << "    z="<< z << endl;
-      }
+     //sets up the electron/ resets it upon death.   
       t = 0;
-      
       
       y = 0.6 * sim->box_sizey* (float)rand() / RAND_MAX + 0.2*sim->box_sizey;
       x = 0.6 * sim->box_sizex* (float)rand() / RAND_MAX + 0.2*sim->box_sizex;
 
+      //if the time is past the equilibration time, reset to the top, else, place randomly
       if (sim->t > 100) {
          z = sim->box_sizez + 10*(float)rand()/RAND_MAX;
       } else {
          z = (float)rand()/RAND_MAX* sim->box_sizez ;
       }
      
-//     if ((float)rand()/RAND_MAX > 0.98) {
-//         y = 75.0 + (float)rand()/RAND_MAX;
-//      } else {
-//         y = 30.0 + (float)rand()/RAND_MAX;
-//      }
- 
       rnd = gen_random();
 
       E = (100000)*sim->E_mean * (abs(rnd)+1.0);
@@ -174,9 +140,9 @@ public:
       vy = (0.001 * sqrt(2*E/sim->m_e) * (float)rand()/RAND_MAX );
       tmp = vx*vx + vy*vy; //calculate how much energy is taken by x,y velocity
       vz = -(sqrt( 2*E / sim->m_e - tmp )) ;
-      emitting = 0;
-      emitting_time_left = 0;
-      emitting_wavelength = 0;
+      emitting = 0;  //not currently emitting
+      emitting_time_left = 0;  //not going to be emitting 
+      emitting_wavelength = 0; //not emitting
       Fx = 0; 
       Fy = 0; 
       Fz = 0;
