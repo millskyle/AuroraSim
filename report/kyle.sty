@@ -1,0 +1,153 @@
+\includeonly{}
+
+\usepackage{graphicx}
+%\usepackage{hyperref}
+%\hypersetup{colorlinks=true,linkcolor=black}
+\usepackage[hidelinks]{hyperref}
+\usepackage{siunitx}
+\usepackage{mathpazo}
+\usepackage{tgpagella}
+
+%\usepackage[T1]{fontenc}
+\usepackage{pdfpages}
+\usepackage{xspace}
+\usepackage{float}
+\usepackage{epstopdf} %EPS vector graphics support
+\usepackage{epsfig}
+\usepackage{mathtools}
+\usepackage{booktabs} %For Excel2Latex Excel Addin
+\ProvidesPackage{kyle}
+
+
+\renewcommand{\vec}[1]{\ensuremath{\mathbf{#1}}}
+\newcommand{\xhat}{\ensuremath{\vec{\hat x }}}
+\newcommand{\yhat}{\ensuremath{\vec{\hat y}}}
+\newcommand{\zhat}{\ensuremath{\vec{\hat z}}}
+\newcommand{\nhat}{\ensuremath{\vec{\hat n}}}
+\newcommand{\ihat}{\ensuremath{\vec{\hat i}}}
+\newcommand{\jhat}{\ensuremath{\vec{\hat j}}}
+\newcommand{\khat}{\ensuremath{\vec{\hat k}}}
+
+\newcommand{\numeq}[2]{
+   \begin{equation}\label{#2}
+   #1
+   \end{equation}
+   }
+
+
+
+\newcommand{\updateHistory}{\immediate\write18{date ''+\%Y-\%m-\%d  \%H:\%M:\%S.\%N >> compile_history.log''}}
+
+
+\newcommand{\timesnewroman}{\usepackage{newtxtext,newtxmath}}
+
+\newcommand{\dd}[2]{\frac{\mathrm{d} #1}{\mathrm{d} #2}}
+\newcommand{\ddt}[2]{\frac{d^2 #1}{d #2 ^2}}
+\newcommand{\pp}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\ppt}[2]{\frac{\partial^2 #1}{\partial #2^2}}
+\newcommand{\dpp}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\lpp}[2]{\ensuremath{\partial #1 / \partial #2}} %inline partial derivative
+
+\newcommand{\kxwt}{\left(kx-\omega t\right)}
+
+%bold vector
+	\newcommand{\vect}[1]{\boldsymbol{#1}}
+\newcommand{\Ang}{\si{\angstrom}\xspace}
+
+
+%easy references
+	\newcommand{\Figure}[1]{Figure~\ref{#1}}
+	\newcommand{\Table}[1]{Table~\ref{#1}}
+	\newcommand{\Equation}[1]{Eq. \!\ref{#1}}
+
+\renewcommand{\d}{\mathrm{\d}}
+
+%non-italisized subscripts:
+	\newcommand{\sub}[1]{_{\mathrm{#1}}}
+
+\newcommand{\degrees}{\ensuremath{^\circ}\xspace}
+\newcommand{\unit}[1]{\ensuremath{\, \mathrm{#1}}}
+\newcommand{\U}[1]{\ensuremath{\, \mathrm{#1}}\xspace}
+
+
+\newcommand{\varHead}[2]{\ensuremath{#1, \unit{#2}}}
+\newcommand{\vH}[2]{\ensuremath{#1, \unit{#2}}}
+\newcommand{\vh}[2]{\ensuremath{#1, \unit{#2}}}
+\newcommand{\vhtxt}[3]{#1, \ensuremath{#2   \unit{\left(#3\right)}}}
+
+
+\newcommand{\hlink}[2]{\hyperref[#1]{#2 \ref*{#1}}}
+
+\newcommand{\insertfigure}[2]{
+\begin{figure}[h]
+\centering
+	\makebox[\textwidth][c]{\includegraphics[width=#2\textwidth]{#1}}
+\caption{}
+\label{#1}
+\end{figure}
+}
+
+\newcommand{\insertfigurecaption}[3]{
+\begin{figure}[h]
+\centering
+	\makebox[\textwidth][c]{\includegraphics[width=#2\textwidth]{#1}}
+\caption{#3}
+\label{#1}
+\end{figure}
+}
+
+
+
+\newcommand{\imagec}[3]{
+\begin{figure}[H]
+\centering
+	\framebox{\includegraphics[width=\textwidth]{#1}}
+	\caption{#3}
+\label{fig:#2}
+\end{figure}
+}
+
+\newcommand{\img}[4]{
+\begin{figure}[H]
+\centering
+	\framebox{\includegraphics[width=#4\textwidth]{#1}}
+	\caption{#3}
+\label{fig:#2}
+\end{figure}
+}
+
+\newcommand{\E}[1]{\ensuremath{\times 10^{#1}}}
+\newcommand{\e}[1]{\ensuremath{\times 10^{#1}}}
+
+\newcommand{\sfrac}[2]{\ensuremath{^{#1}/_{#2}}}
+
+\newcommand{\tab}{\hspace{2em}}
+\newcommand{\sectionzero}{\setcounter{section}{-1}}
+
+
+\newcommand{\authorCAP}[2]{#1 \textsc{#2}}
+
+\newcommand{\kyletitlepage}[4]{
+\clearpage
+	\thispagestyle{empty}
+	\begin{center}	
+	\small{University of Ontario Institute of Technology}
+	\end{center}
+	\begin{center}
+	\huge{#1}
+	\end{center}
+	\begin{center}
+		\large{#2}
+	\end{center}
+	\vfill
+	\begin{center}
+	\large{#4}
+	\end{center}
+	\begin{center}
+		\small{#3}
+	\end{center}
+\newpage
+}
+
+
+\newcommand{\ohm}{\ensuremath{\Omega}\xspace}
