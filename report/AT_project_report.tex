@@ -1,0 +1,343 @@
+\documentclass[twocolumn]{article}
+
+%\usepackage[sc]{mathpazo} % Use the Palatino font
+\linespread{1.2} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+\usepackage{kyle}
+
+\usepackage{float}
+
+\usepackage[numbers,  super]{natbib}
+
+\renewcommand{\vec}[1]{\mathbf{#1} }
+\renewcommand{\dot}{\cdot}
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage{multicol} % Used for the two-column layout of the document
+\usepackage[small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+
+\usepackage{graphicx}
+%\usepackage{float} % Required for tables and figures in the multi-column environment - they need to be placed in specific locations with the [H] (e.g. \begin{table}[H])
+\usepackage{graphicx}
+\usepackage{hyperref} % For hyperlinks in the PDF
+\usepackage{lipsum}
+
+\usepackage[super]{cite}
+
+\usepackage[font=small,]{caption}
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+\usepackage{paralist} % Used for the compactitem environment which makes bullet points with less space between them
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+%\newcommand{\numeq}[2]{\begin{equation}\label{#2} #1 \end{equation} }
+\newcommand{\unnumeq}[1]{\begin{equation*} #1 \end{equation*} }
+\newcommand{\bra}[1]{\left\langle#1\right|}
+\newcommand{\ket}[1]{\left|#1\right\rangle}
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\Roman{subsection}} % Roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\renewcommand\bibname{References}
+
+%\newcommand{\so2}{SO$_2$}
+
+\renewcommand{\div}{\nabla\cdot\vec}
+\newcommand{\curl}{\nabla\times\vec}
+
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{Simulating the Aurora $\cdot$ Fall 2015 $\cdot$ MCSC 6280} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{\vspace{-15mm}\fontsize{20pt}{10pt}\selectfont\textbf{Simulating the Aurora}} % Article title
+
+\author{
+\large
+\textsc{Kyle Mills}\\[2mm] % Your name
+\normalsize University of Ontario Institute of Technology \\ % Your institution
+\normalsize \href{mailto:kyle.mills@uoit.net}{kyle.mills@uoit.net} % Your email address
+\vspace{-5mm}
+}
+\date{}
+
+%\newcommand*{\citen}[1]{%
+%  \begingroup
+%    \romannumeral-`\x % remove space at the beginning of \setcitestyle
+%    \setcitestyle{numbers}%
+%    \cite{#1}%
+%  \endgroup   
+%}
+
+
+\renewcommand{\insertfigure}[3]{\begin{figure}[tbh]
+\centering
+	\makebox[\columnwidth][c]{
+	\includegraphics[width=#2\columnwidth]{#1}
+	}
+\caption{#3}
+\label{#1}
+\end{figure}}
+
+
+\newcommand{\insertfigurewideHERE}[3]{\begin{figure*}[h!]
+\centering
+	\makebox[\columnwidth][c]{
+	\includegraphics[width=#2\columnwidth]{#1}
+	}
+\caption{#3}
+\label{#1}
+\end{figure*}}
+
+\newcommand{\insertfigurewide}[3]{\begin{figure*}[bth]
+\centering
+	\makebox[\columnwidth][c]{
+	\includegraphics[width=#2\columnwidth]{#1}
+	}
+\caption{#3}
+\label{#1}
+\end{figure*}}
+
+
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+
+
+\thispagestyle{fancy} % All pages have headers and footers
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+\twocolumn[\maketitle \begin{abstract}
+An agent-based approach to simulating the dynamics of the aurora is presented. We combine a dynamic agent-based model with a stochastic Monte Carlo approach to reproduce the dynamics of the aurora.  We investigate the consistency between our model and some physically observable characteristics of the aurora. Finally, we extend our model to other planetary aurora, specifically Jupiter's moon Io.
+\end{abstract}]
+
+
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+
+ % Two-column layout throughout the main article text
+
+\section*{Introduction}
+\lettrine[nindent=0em,lines=2]{T}he Sun provides energy to the Earth through many sources of radiation, sunlight being a visible example.  In addition to radiative energy, the Sun produces a constant flux of charged particles, highly energetic protons and electrons, which bombard the Earth.  Earth's magnetic field is strong enough to protect most of the planet from these particles by funnelling the protons and electrons toward the poles.  Once near the poles, the particles descend toward the Earth, exciting atoms in the atmosphere and creating a colourful light show known as the \emph{aurora}.
+
+Earth's magnetic field is a critical component of the visible aurora.  The magnetic field of the Earth is a consequence of the internal motion of Earth's liquid iron core.  Far from Earth, the complicated magnetic field can be approximated sufficiently by a magnetic dipole\cite{Enns2010}.  Near the poles, the magnetic field accelerates the particles downward toward the Earth, where they collide with atmospheric gas atoms in the ionosphere. \insertfigure{../presentation/img/fieldlines.pdf}{0.8}{The magnetic field lines of Earth guide charged particles to the poles.}
+
+When a collision occurs, the electron excites the atom to a higher energy state.  Some time after the collision (and excitation), the excited gas atom decays back to its ground state and a photon is emitted. The wavelength $\lambda$ of the emitted photon is determined by the energy difference $\Delta E$ between the excited state and ground state:
+\numeq{\lambda = \frac{hc}{\Delta E},}{energywavelength} where $h$ is Planck's constant, and $c$ is the speed of light.  This emission of photons is collectively referred to as the \emph{aurora borealis} in the Northern Hemisphere and \emph{aurora australis} in the Southern Hemisphere\cite{Baranoski2003}.  Aurora have been observed on other bodies in the solar system, such as Mars\cite{Dubinin2009,Soret2016} and Jupiter's moon Io\cite{Saur2000,Roth2014}.
+
+The electron-atom collisions cause the electrons to scatter through the atmosphere, deflecting along modified trajectories\cite{Rees1992}.  These collisions reduce the kinetic energy of the electrons, until their energy is sufficiently low that no additional atomic excitations are possible. At this point the electron is indistinguishable from free electrons in the atmosphere.
+
+The beautiful colours of the aurora are produced by the various wavelengths of emitted photons.  On Earth, three emissions dominate the auroral spectra: atomic oxygen produces emissions at 630 and 557.7 nm (red and green, respectively) and atomic nitrogen produces a rare blue emission at 427.8 nm.\cite{Sandahl2008,Semeter2003}.  On Jupiter's moon Io, the atmosphere is composed mainly of sulfur dioxide\cite{Saur2000}, which produces emissions at 450, 335, and 300 nm (blue, ultraviolet, and ultraviolet, respectively).\cite{Ajello2002}  The colours that one observes are due to the combination of these photons as processed by the human eye.
+
+\insertfigure{../presentation/img/ab_swirls.jpg}{1.0}{Photograph of the aurora borealis, as viewed from Earth. Auroral curtains can be seen within the overall swirl structure. Low altitude emissions appear green, while the higher altitude emissions are more pink in colour.}
+
+When an electron collides with an atom, the atom is deflected.  If the atom collides with another atom before it decays back to the ground state, the excited state energy can be dissipated without the emission of a photon\cite{Hunten1966}. This process is known as quenching. For Earth aurora, the three main excited states have varying lifetimes: the red excited states can last over 100 seconds, whereas the green and blue states both last less than 1 second. Thus, at high altitudes and low atom densities, the red emissions have a lower chance of being quenched than at low altitude and higher atom densities, where the shorter-lived green and blue emissions dominate.  This effect produces the colour distribution observed in the aurora: pink emissions (which are mostly red, mixed with some green and blue) at high altitudes and predominantly green/blue emissions at low altitudes.
+
+Another feature of the aurora is its magnificent structure. The structures observed in the aurora can be categorized into two groups: \emph{swirls} and \emph{curtains}.  While swirls are the result of ionospheric currents and complicated plasma fluid dynamics\cite{Blixt2006,Sandahl2008}, auroral curtains can be attributed to the electric field formed by the collective of electrons travelling through the ionosphere\cite{Baranoski2005}.  The electrons themselves interact with this electric field, and the magnetic field of Earth, and form auroral curtains.  It is these curtain structures that we wish to replicate through simulation.
+
+
+
+
+\section*{{S}imulation {T}echniques}
+
+In 2003, Baranoski\cite{Baranoski2003}, et al. presented their approach to simulating the aurora, with the goal of replicating the visual appearance of the natural phenomenon.  Prior to this, in 1991 Borovsky, \cite{Borovsky1991} et al. provided insight into a stochastic approach in which they tracked individual electrons to simulate the auroral emissions and make predictions about physical attributes of the curtain-like auroral structure.  In our work, we have implemented features from both in a preliminary attempt to simulate both the visual aspects and some physical characteristics, mainly the energy deposition rate, of the aurora.
+
+\subsubsection*{The system}
+
+The main photon emission of the aurora occurs within an altitude range of 100 to 300 kilometres above the surface of Earth\cite{Campbell1961,Baranoski2003}.
+As such, we have discretized the volume of a 200 $\times$ 200$\times$ 200 km cube into a three-dimensional mesh, with each mesh-point corresponding to a resolution of 1 cubic kilometer.  This will be our simulation box, with the origin being the North-Eastern most vertex, closest to the Earth. A stochastic simulation approach was taken, similar to that of Borovsky, \cite{Borovsky1991} et al., where individual electrons are tracked as they proceed along a trajectory through the simulation box. Each electron is initialized with a starting energy, and a corresponding velocity primarily in the $z$ direction (more on initialization below).  Each electron is assigned a position vector $\vec x$, a velocity vector $\vec v$, and a force vector $\vec F$, and the motion of the electrons is evolved through a forward Euler integration scheme, consistent with [\citen{Borovsky1991}]:
+\begin{align}
+\vec v (t + dt) &= \vec v(t) + \frac{\vec F}{m} dt \\
+\vec x(t + dt) &= \vec x (t)  + \vec v(t+dt) dt .  
+\end{align}
+External forces (e.g. influence of electric or magnetic fields) can be incorporated through each electron's force vector.
+Periodic boundary conditions are used in the $x$ and $y$ directions.
+
+\insertfigure{../presentation/img/simulation_cell_w_earth.pdf}{0.9}{A schematic representation of the simulation box used in this work.  The incoming electrons enter through a square region in the top with width of one-third box size. }
+
+As auroral electrons travel, they ``interact'' with atoms in the atmosphere. 
+For our system, an ``interaction'' occurs when an electron collides with an atmospheric molecule, however there is no explicit concept of air molecules in the simulation.  
+At high altitudes, the real-world atmospheric gases are of low density and electrons have a lower probability of interacting.  
+At lower altitudes, the electrons have a much higher probability of interacting due to the high density of atmospheric molecules.  
+This variation is treated stochastically, with each electron experiencing an interaction based on a probability dependent upon its current height.  A Monte Carlo approach is used, where a random number is generated from a uniform distribution, and if the random number is greater than the height-dependent probability threshold, a collision is said to have occurred.  The density of the atmosphere decreases exponentially with height, as \cite{Administration1976}
+\begin{equation}
+\rho\sub{air} (z) = \rho\sub{air_0}e^{-kz}
+\end{equation}
+where $\rho\sub{air_0}$ and $k$ are positive constants.  Since the probablity of collisions is directly dependent on the density of the air, the probability threshold will also scale as an exponential.  In effect, this leads to electrons at low altitudes experiencing far more collisions than electrons at high altitudes. 
+ 
+If a collision occurs, then there are two outcomes: (a) a photon is emitted, or (b) the excited state is quenched.  Both of these outcomes can be effected through a Kinetic Monte Carlo approach.  
+If a collision occurs, then either a red, green, or blue photon is emitted, or no photon is emitted (i.e. quenching).  
+The rates used for the Kinetic Monte Carlo implementation are dependent on the height of the electron, as air density again plays a critical role in the relative probability of each outcome.
+A rate polynomial was constructed fitting each of the probability curves in Figure \ref{../presentation/img/Earth_color_probs_paper.pdf}.  Each time a collision occurs, the rate polynomials are evaluated, and the outcome is determined based on the position of a random number on the interval $(0,1)$. \insertfigure{../presentation/img/Earth_color_probs_paper.pdf}{1.0}{The rates used for the Kinetic Monte Carlo approach to photon emission are based on atmospheric density, which influences excited state lifetime and the probability of quenching. Data from [\citen{Baranoski2003}].}
+If a photon is emitted, the energy of the electron is decreased according to $\Delta E = hc/\lambda$ and the velocity is rescaled to be consistent with the new energy.
+The timestep $dt$ of integration is set such that the electrons experience approximately 300 collision events in a single pass through the system\cite{Baranoski2005}.
+
+
+
+
+\subsubsection*{Electrostatics}
+These ballistic electrons are sparse enough, and travel at high enough speeds that they can be treated as non-interacting in the sense that they do not collide with one another (at the scale we are simulating, electrons are tens of metres apart). Their motion, however, is heavily influenced by the electric field $\vec E$ generated by all of the electrons present in the aurora. This is what causes the curtain-like structure of the aurora which we wish to replicate.
+
+In order to solve for the electric field at each timestep, the three dimensional charge density $\rho(x,y,z) = \rho(\vec x)$ within the simulation box is computed by simply counting the number of electrons within the volume-cells of a discretized mesh.  The size of the charge density mesh is determined by the  number of electrons being simulated so that $\rho(\vec x)$ is relatively smooth.  The charge density relates to the electrostatic potential $\phi(\vec x)$ through
+\begin{equation}
+\nabla ^ 2 \phi  = -\frac{\rho}{\epsilon_0}.
+\end{equation}
+Recast in integral form, the electrostatic potential can be written as \cite{griffiths_ED}
+\begin{equation}
+\phi(\vec x) = -\frac{1}{4\pi\epsilon_0}\int{\frac{\rho(\vec r) }{\left| \vec x - \vec r \right| } \mathrm{d} ^3\vec r},
+\end{equation}
+which in frequency space is
+\begin{equation}\label{phifourierspace}
+\phi(\vec x)  = -\frac{1}{8\pi^2\epsilon_0}\int{ \frac{\mathcal{F}_\rho (\vec k)}{\vec k^2}e^{i\vec k\cdot\vec x }\mathrm{d}^3\vec k    }
+\end{equation}
+where
+$\mathcal{F}_\rho (\vec k)$ is the Fourier transform of $\rho(\vec x)$.  Since the electric field is given by the gradient of the potential, that is,
+\begin{equation}
+\vec E(\vec x) = -\vec\nabla \phi(\vec x),
+\end{equation}
+we can differentiate (\ref{phifourierspace}) with respect to $\vec x$ to obtain
+\begin{equation}\label{EfieldFourierSpace}
+\vec E (\vec x) = \frac{i}{8\pi^2\epsilon_0}\int{   \frac{\vec k \mathcal{F}_\rho (\vec k)}{\vec k ^ 2}e^{i\vec k\cdot\vec x }\mathrm{d}^3\vec k }
+\end{equation}
+This allows us to compute the electric field in Fourier space directly. In practice, FFTW3\cite{FFTW05} is used to compute $\mathcal{F}_\rho(\vec k)$.  Each element of the resulting array is then normalized by the appropriate value of $\vec k^2$, and the real and imaginary components are swapped (note the $i$ in (\ref{EfieldFourierSpace})).  The three real-space components are obtained by multiplying by the appropriate wavevector $\vec k$, and and the inverse Fourier transform if applied to recover the electric field in Euclidean space. This electric field mesh is them mapped onto the simulation box mesh.  At the next timestep, the electrons at point $\vec x$ feel the Lorentz force
+\begin{equation*}
+\vec F(\vec x) = q(\vec E(\vec x) + \vec v \times \vec B).
+\end{equation*}
+Here, the magnetic field is approximated as the magnetic field of the Earth, taken as $\vec B = -B_0\yhat$ (that is, pointing toward the North Pole).  This is a suitable approximation as the timescale on which large variations in the magnetic field occur is much larger than the timescales investigated here.\cite{Courtillot1988}  A consequence of this approach is that electrons will inherently interact with themselves, as the electric field is constructed once globally for each timestep. This is not of practical concern as we can choose a Fourier transform mesh that is sufficiently large so that these self interactions average out over a region of space.
+
+\subsubsection*{Initialization and equilibration}
+
+At the beginning of the simulation, $N=2^{20}$ electrons are placed randomly in a square column in the centre of the simulation box. The electrons are randomly distributed and span the $z$ dimension of the simulation box (see Figure \ref{../presentation/img/simulation_cell_w_earth.pdf}).  The electrons are assigned an initial energy according to a Gaussian distribution centred at 8keV with a standard deviation of 4 keV. This encompasses most of the observed range of energies present in the aurora \cite{Sandahl2008}.  Considering this energy as the kinetic energy of the electron, the initial velocity components are calculated, with 99.98\% of the energy being consumed in the downward $z$ velocity, and 0.01\% in each the $x$ and $y$ directions.
+
+The electrons are recycled through the system for the duration of the simulation.  When an electron exits through the bottom of the cell, or its energy falls below that of a photon emission, it is no longer of interest to the simulation and it is reinitialized to another starting configuration.  For the first $t\sub{eq}=100$ timesteps, any electrons that are reinitialized are placed within the central column.  After $t\sub{eq}$ timesteps, reinitialized electrons begin from a location slightly above the top of the cell, still within the column, but offset vertically.  If all electrons originated from the top of the cell, a charge distribution concentrated at the top of the cell would initially be present resulting in unrealistically high repulsive forces. This approach leads to a consistent electron flux after a few hundred timesteps.
+
+\insertfigure{../presentation/img/projection.pdf}{0.7}{The projection used to output images}
+
+\subsubsection*{Photon emission and visualization }
+
+
+Baranoski, \cite{Baranoski2003} et al. had the goal of reproducing the visual appearance of the aurora as it would look to an Earth-bound observer.  This required advanced perspective ray tracking of the photon emissions back to the observer. In addition, they used Gaussian kernel smearing to account for the temporal resolution of a photon collection device, whether that is a camera or the human eye.
+
+We have taken a much simpler approach, using an orthographic projection (Figure \ref{../presentation/img/projection.pdf}).  We use 3 three-dimensional arrays to keep track of the photon intensities of each colour channel (red, green, and blue) at every point in space.  When a photon is emitted, the bin corresponding to the electon's position is incremented with the correct intensity. The photon intensity is aggregated for $t\sub{frame}=5$ timesteps, after which it is collapsed to a two-dimensional array and written out to an image file. Processing the photon intensity data is done in two passes: the first pass sums the data along the $x$-axis, with the intensity dropping off as $1/x^2$ so that emissions close to the viewer appear brighter than emissions that occur far away.  The second pass normalizes all bins by the brightest pixel out of all colour channels so that the relative RGB intensities are preserved.  Since human intensity perception is not the same for all wavelengths the RGB data for each colour channel is transformed according to
+\begin{equation}
+\begin{bmatrix}
+I_R' \\
+I_G' \\
+I_B' \\
+\end{bmatrix} = 
+M
+\begin{bmatrix}
+I_R \\
+I_G \\
+I_B \\
+\end{bmatrix},
+\end{equation}
+where
+\begin{equation}
+M=
+\begin{bmatrix}
+0.2126 & 0 & 0 \\
+0 & 0.7152 & 0 \\
+0 & 0 & 0.0722 \\
+\end{bmatrix}
+\end{equation}
+is the transformation matrix to account for human perception of colour intensity\cite{ZahidHasan2012}.  The result is a 2D array that can be rendered to an image, and a sequence of images can be combined to form an animation.
+
+
+
+
+
+\insertfigure{../presentation/img/energy_deposition.pdf}{1.1}{Relative energy deposited (arbitrary scale) as a function of height above Earth.  Measurements from [\citen{Wedlund2013}] and [\citen{Ishikawa2013}] superimposed for qualitative comparison.}
+
+\insertfigure{../presentation/img/charge_density.pdf}{1.0}{Charge density slice at an altitude of $z=100$, halfway through the simulation cell. The banding that we see in Figure \ref{Earth_image.png}a can be faintly seen here as vertical clusters of higher density.  This is at timestep 5000.}
+
+\section*{Results}
+
+\insertfigurewide{Earth_image.png}{2.0}{(a) A single frame from a simulation of Earth's aurora using the methods explained above, rendered through an orthographic projection.  (b) Simulation results from Baranoski, et al. [\citen{Baranoski2005}] who used a perspective projection. (c) Photograph of aurora borealis curtains.}
+
+
+Baranoski, et al. focussed on reproducing the appearance of the aurora in their work. In our analysis, we wish to look both at the visual appearance of the aurora, plus extend the analysis to look at the energy deposition rate, and compare with experimental measurements.
+
+Figure \ref{Earth_image.png}a shows a frame from our simulation results.  The orthographic projection described above is used.  The curtain-like structure is clearly visible, and is a result of the complicated electrostatic interactions between the moving electrons in the ionosphere.  Our image looks quite similar to Baranoski's image (Figure \ref{Earth_image.png}b), aside from the differing projection methods.  Both of the methods are good replications of the photograph in Figure \ref{Earth_image.png}c, and the curtain-like structure exhibited by the real aurora.
+
+Since Baranoski, et al. were trying to reproduce the appearance of auroral formations, they did not validate their model against any experimentally observable data to see if it was consistent with physical observations.  In order to extend the analysis, we will compare the energy deposited (as a result of photon emissions) into the atmosphere to measurements made by Wedlund, et al. \cite{Wedlund2013} using the Auroral Large Imaging System (ALIS).  Every time a photon is emitted, we transfer its emission energy, $E = hc/\lambda$ from the electron to an array representing the ``atmosphere'' and record the height of the emission.  Figure \ref{../presentation/img/energy_deposition.pdf} displays a histogram of this data with respect to emission altitude.  We can see that, at low altitudes, our simulation qualitatively with the ALIS data, however at high altitudes, our simulation sees significantly higher energy deposition rates.  We propose that this could be fixed by incorporating scattering into our simulation.  When an electron collides with an air molecule, in reality the electron will be deflected with some non-negligible horizontal velocity.  In our current model the electron slows down, but its horizontal velocity is not affected. Incorporating this effect would increase the time which an electron spends in the upper atmosphere, thus increasing the chance of excitations being quenched before a photon can be emitted.
+The spike in the energy deposition rate at low altitudes can be explained by considering the factors that effect photon emission. First, collisions at low altitudes are more likely due to the increased air density.  Furthermore, the high air density causes a bias toward the shorter-lived excited states, as the long-lived (red) states will have a high chance of quenching. The shorter-lived states emit higher energy photons.  Finally, at low altitudes, the electrons will have already experienced numerous collisions and emissions, causing them to be travelling much slower than at high altitudes. This means they spend more time in the low altitude region, and therefore have more opportunity for collisions.
+
+Figure \ref{../presentation/img/charge_density.pdf} shows a slice of the charge density at a height halfway through the simulation cell, and at long time (timestep 5000).   This effectively shows the positions of the auroral electrons, giving some additional insight into the structures they form. It can be seen that, even though the electrons are originating in the center of the cell at $z\sim 200$, as they progress through the cell they cluster in a banding structure, evidenced by the vertical bands of high density on Figure \ref{../presentation/img/charge_density.pdf}.  This gives rise to the curtain-like formations seen from Earth.  We see a diagonal structure of higher density spanning from the lower left to the upper right of the figure.  This is likely the beginnings of an auroral arc, a structure that is much larger in scale than the size of our simulation box.  Using a significantly larger box could give more insight into this structure and if indeed it is the beginning of an auroral arc.
+
+
+
+
+
+%\insertfigurewide{../presentation/img/io_picture.pdf}{2.0}{(a) Aurora as seen on Io (b) Simulated energy deposition on Earth compared with the energy deposition on Io. }
+
+\insertfigure{../presentation/img/io_spect.pdf}{0.8}{450, 335, and 300 nm wavelengths will be represented by these colours, with a false-colour representation of the ultraviolet frequencies}
+
+
+Earth's aurora is the subject of countless photographs, and its visual appearance is very well studied. There are other auroras, however, existing on Mars, Jupiter and Jupiter's moon Io, which have not been photographed in such amazing detail.  For this reason, it would be informative to have a technique to simulate the aurora on another celestial body and produce images of what it would look like to an observer there.
+
+
+We investigated the aurora on Jupiter's moon Io.  Io is an interesting candidate for aurora, as it is covered in active volcanoes which spew sufur dioxide (SO$_2$) into the atmosphere.\cite{Ballester1994,Keszthelyi2001}.  It is this gas that auroral electrons excite, causing the aurora on Io.  Furthermore, Io's magnetic field is dominated by Jupiter's magnetic field.  Jupiter's magnetic field is so intense that its iteraction with Io's magnetic field causes a rotating ring of ions to form around Io.  This rapidly rotating plasma torus forms a feedback system, inducing a powerful current around Io, which further intensifies the Jovian magnetic field\cite{Soediono1989a}.  This amounts to Io having an extremely intense magnetic field.
+
+Sulfur dioxide has three main emission wavelengths: 450 nm, 335 nm, and 300 nm which produce blue, ultraviolet, and ultraviolet light, respectively\cite{Ajello2002}. Since the longer-wavelength emissions have longer lifetimes\cite{Caton1968}, the same rate polynomials as those used for Earth are used.  Since the magnetic field on Io will be significantly larger than that of the magnetic field on Earth, we will increase the strength of the magnetic field.  The ultraviolet emissions will be mapped to visible violet RGB values, and the same emission rate polynomials will be used.
+
+Figure \ref{../presentation/img/io_picture.pdf}a shows the resulting aurora.  This modification will, in effect, produce a visually similar aurora as that of Earth, but it can be seen that the increased magnetic field smears the low altitude electrons, diminishing the well-defined curtain-like structure apparent on Earth. Plotting the energy deposition as a function of height on Io and Earth (Figure \ref{../presentation/img/io_picture.pdf}b), it is clear that Io has a much higher energy deposition in the upper atmosphere. This is likely due to the fact that blue emissions are significantly higher energy than the red emissions on Earth.  Thus the emission of blue photons causes the electrons to decelerate rapidly, depositing more energy at higher altitudes.  Any leftover energy is quickly dissipated when the electrons move into the region of high-probability ultraviolet emissions, where the energetic cost of a photon emission is even higher.
+
+
+\section*{Conclusion}
+The aurora is one of the most beautiful demonstrations of the complicated physics present in nature.  Using an agent-based simulation method, we have combined a dynamic simulation with a stochastic model of photon emission to replicate the visual appearance of auroral phenomena.  The model performs moderately well in qualitately predicting the energy deposition rates at low altitudes, but falls short at high altitudes.  This is likely because we neglected some aspects of the dynamics, such as scattering, in the simulation.  We've extended the model to simulate the dynamics of aurora on other celestial bodies.  To improve this model, the effect of the magnetic field created by the motion of the charge distribution (i.e. electro\emph{dynamics}) coupling with the electric field should be investigated.  This may give rise to more dynamic structures (e.g. swirls, etc.).   Overall, this model successfully reproduces the auroral curtain structure observed in photographs. \insertfigurewide{../presentation/img/io_picture.pdf}{2.0}{(a) Aurora as it might appear on Io (b) Simulated energy deposition on Earth compared with the energy deposition on Io. }
+
+
+
+\subsubsection*{Resources}
+
+\begin{itemize}
+
+\item Videos of the dynamics simulated in this report can be viewed on Youtube:
+
+Earth:\\
+\href{https://www.youtube.com/watch?v=gjtSmKf2iMs}{youtube.com/watch?v=gjtSmKf2iMs}
+
+Io:\\
+\href{https://www.youtube.com/watch?v=UCCOclCQIHE}{youtube.com/watch?v=UCCOclCQIHE}
+
+
+\item The simulation code can be downloaded or viewed from the GitHub repository:
+
+\href{https://github.com/millskyle/AuroraSim}{github.com/millskyle/AuroraSim}
+
+\end{itemize}
+
+
+\clearpage
+\bibliography{../../../../../Mendeley/bibtex/OtherResearch-AuroraBorealis}{}
+%\bibliography{thesis}{}
+
+\bibliographystyle{myplain}
+
+%----------------------------------------------------------------------------------------
+
+
+
+\end{document}
