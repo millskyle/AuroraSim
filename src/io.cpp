@@ -8,17 +8,20 @@
 #include <string.h>
 #include <fftw3.h>
 
+// This is IO as in INPUT/OUTPUT.  Named this prior to simulating Jupiter's moon Io, so this is a misleading
+// filename.  Sorry.
+
+
 using namespace std;
 
 
 class EnergyDensity {
+   //class to keep track of the energy deposited into the system. It's a 1D array.
    public:
       int resolution_z ;
-
       float *energy_density; 
       ofstream energy_density_out;
-
-
+      
       int init(int resz) {
          resolution_z = resz;
          energy_density = new float[resz];
@@ -27,6 +30,7 @@ class EnergyDensity {
          }
       }
 
+      //zero it out
       int reset() {
          for (int i=0; i< resolution_z; i++) {
             energy_density[i] = 0;
@@ -34,16 +38,14 @@ class EnergyDensity {
          return 0;
       }
 
-
-
       int increment(int i, float n) {
+         // increment if it's a valid bin, otherwise don't 
+         // (prevents seq faults if electrons move outside box)
          if (i>=0 && i<resolution_z) {
             energy_density[i]+=n;
          } 
          return 0;
       }
-
-
 
       int write_out(int t) {
          energy_density_out.open("energy/E_density_" + to_string(t) + ".dat");
@@ -53,10 +55,8 @@ class EnergyDensity {
          energy_density_out.close();
       }
 
-
-
     void cleanup() {
-    //   delete[] energy_density;
+    //   delete[] energy_density; //this was giving me problems.  TO-DO: FIX THIS
     }
 
 };
@@ -65,30 +65,29 @@ class EnergyDensity {
 
 
 class PhotonDensity {
-
-
+   //class that keeps track of the photon density (i.e. the emissions).
    public:
       int resolution_x = 400; //divisions along the box dimension
-      int resolution_y = 400;
-      int resolution_z = 400;
+      int resolution_y = 400; //increasing these values significantly increases 
+      int resolution_z = 400; //the time required to output the image.  Too large and images are huge.
         
       ofstream img;
 
-      float optical_decay_power = 1.6; //light intensity drops off as distance to this power (vacuum would be 2.0) 
-
-
-      Simulation* sim;
+      float optical_decay_power = 2.0; //light intensity drops off as distance to this power (vacuum would be 2.0) 
+      Simulation* sim; //pointer to Simulation object
 
       int init(Simulation *s) {
-         sim = s;
+         sim = s; //set the simulation pointer
          return 0;
       }
       
+      //we need a 3d array for each colour.
       float *R  = new float[resolution_x*resolution_y*resolution_z];
       float *G  = new float[resolution_x*resolution_y*resolution_z];
       float *B  = new float[resolution_x*resolution_y*resolution_z];
 
       int reset() {
+         //function to zero out photon density
          cout << "\r Zeroing out photon density                                     " ;
          cout.flush();
          for (int i=0; i<(resolution_x*resolution_y*resolution_z); i++ ) {                 
@@ -100,16 +99,19 @@ class PhotonDensity {
       }
 
       int incr_element(float *A ,int i, int j, int k,float n) {      
+         //function to increment voxel. Handles 3D array indexing
          A[i + resolution_x *( j + resolution_y * k) ] += n;
          return 0;
       }
 
       float get_element(float *A, int i, int j, int k) {
+         //function to access voxel, handles 3D array indexing
          return A[i + resolution_x *( j + resolution_y * k) ];
       }
        
       
      float get_max_voxel(float *A) {
+        //function to return the value of the maximum voxel in an array
         float maxx = 0;
         for (int i=0; i< (resolution_x*resolution_y*resolution_z)    ; i++) {
            maxx = max(maxx,A[i]);
@@ -118,6 +120,7 @@ class PhotonDensity {
      }
 
      float scalar_divide(float *A, float s) {
+        //divide an array by a scalar
         for (int i=0; i<(resolution_x*resolution_y*resolution_z); i++)  {
            A[i] = A[i] / s;
         }
@@ -125,42 +128,17 @@ class PhotonDensity {
      }
 
      int destroy(float *A) {
+        //destroy the photon density array
         delete [] A;
         return 1;
      }
     
-     float normalize() {
-        float maxR,maxG,maxB;
-
-
-        maxR = get_max_voxel(R);
-       // *R = scalar_divide(R,maxR);
-        maxG = get_max_voxel(G);
-//        *G = scalar_divide(R,maxR);
-        maxB = get_max_voxel(B);
-//        *B = scalar_divide(R,maxR);
-        float gmax; //global max brightness
-        gmax = max(maxR,maxG);
-        gmax = max(gmax,maxB);
-
-        cout << "\rBrightest voxel had un-normed brightness of " << gmax << "                             ";
-        cout.flush();
-
-        for (int i=0; i<(resolution_x*resolution_y*resolution_z); i++)  {
-           R[i] = R[i] / gmax;
-           G[i] = G[i] / gmax;
-           B[i] = B[i] / gmax;
-        }
-        
-     }
-     
+    
      int write_image(int t) {
-        cout << "\rNormalizing for max brightness                                 " ;
-        cout.flush();
-//        normalize();
-
+        //function to write the image out to an output file. Writes a flat file of RGB values which I 
+        //then use Python & matplotlib to render an image.
         img.open("output/" + to_string(t) + ".dat");
-
+        
         img << resolution_y << " " << resolution_z << "\n";
 
         float *Rflat  = new float[resolution_y*resolution_z];
@@ -179,8 +157,8 @@ class PhotonDensity {
         float maxpixelsumB =0;
         float gmax = 0;
 
+        //collapse the image along the x dimension
         for (int k=0; k<resolution_z; k++) {
-         //  cout << "z=" << k << endl;
            for (int i=0; i<resolution_x; i++) {
               pixelsumR=0;
               pixelsumG=0;
@@ -195,16 +173,14 @@ class PhotonDensity {
               Rflat[k*resolution_y + i ] = pixelsumR;
               Gflat[k*resolution_y + i ] = pixelsumG;
               Bflat[k*resolution_y + i ] = pixelsumB;
-//              maxpixelsumR = max(maxpixelsumR,pixelsumR);
-//              maxpixelsumG = max(maxpixelsumG,pixelsumG);
-//              maxpixelsumB = max(maxpixelsumB,pixelsumB);
            }
         }
 
-//        gmax = (maxpixelsumB + maxpixelsumG + maxpixelsumR) ;
-//        cout << "!!" << gmax << "!!" << endl;
         element = -1;
+        //get a global max, which we normalize by (dependent somewhat arbitrarily on electron density)
         gmax = (float)sim->N * pow(((float)resolution_x / (float)sim->box_sizex),3)  * 0.03 ;
+        
+        //write out the (now) 2D data to a file
         for (int k=0; k<resolution_z; k++) {
            for (int j=0; j<resolution_y; j++) {
               element++;
@@ -215,9 +191,9 @@ class PhotonDensity {
            }
         }
         
-        img.close();
+       img.close();
        
-       
+       //delete the flattened arrays, don't need them anymore
        delete[] Rflat;
        delete[] Gflat;
        delete[] Bflat;
@@ -226,7 +202,7 @@ class PhotonDensity {
      }
     
 
-
+    //function to clean up pixel arrays
     void cleanup() {
        delete[] R;
        delete[] G;
@@ -236,43 +212,5 @@ class PhotonDensity {
 
 
 };
-
-
-
-
-/*class OutputReport {
-  public:
-    vector<float> EvsT;
-    int interactions;
-    int respawns;
-
-    ofstream initial_positions_file;
-    int init() {
-       initial_positions_file.open("output/initial_positions.txt");
-    }
-
-
-    int write(string filename) {
-        ofstream report;
-        report.open(filename);
-
-       
-       report << "Particle 3:\nTime-dependent energy" << endl;
-       for (int t=0; t < EvsT.size()-1; t++ ) {
-          report << t << "\t" << EvsT[t] << endl;
-       }
-
-       report << "\n" ;
-       report << "Interactions per life:" << (float)interactions/(float)respawns << endl;
-       report << "Interactions: " << (float)interactions << "       Respawns: "<<(float)respawns << endl;
-
-       report.close();     
-       return 0;
-
-    }
-
-};
-*/
-
 
 #endif
