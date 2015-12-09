@@ -8,7 +8,16 @@ import cv2
 import re
 import Image
 
+"""INFO
+
+   script to take output data and convert to a series of images, fading between frames
+
+"""
+
+
 brightness = sys.argv[1]
+
+
 
 
 alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n']
