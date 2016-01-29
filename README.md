@@ -13,4 +13,4 @@ _An agent-based approach to simulating the dynamics of the aurora is presented. 
 ##src
   The C++ code for the simulation.
 
-This project was the final project for the Graduate course Advanced Topics in Computational Science at the University of Ontario Institute of Technology. The course was offered in Fall 2015.
+This project was the final project for the Graduate course Advanced Topics in Computational Science at the University of Ontario Institute of Technology. The course was offered in Fall 2015 and taught by Dr. Hendrick de Haan.
